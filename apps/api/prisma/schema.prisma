@@ -1,0 +1,448 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+// ==========================================
+// 1. TENANTS
+// ==========================================
+
+model Tenant {
+  id     String @id @default(uuid()) @db.VarChar(36)
+  name   String @db.VarChar(160)
+  slug   String @unique @db.VarChar(80)
+  status String @default("ACTIVE") @db.VarChar(20)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.DateTime(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.DateTime(6)
+
+  memberships     TenantMembership[]
+  roles           Role[]
+  auditLogs       AuditLog[]
+  projects        Project[]
+  activities      Activity[]
+  dprs            DailyProgressReport[]
+  siteSubmissions SiteSubmission[]
+  attendanceSessions AttendanceSession[]
+
+  @@map("tenants")
+}
+
+// ==========================================
+// 2. USERS - GLOBAL IDENTITY
+// ==========================================
+
+model User {
+  id              String  @id @default(uuid()) @db.VarChar(36)
+  fullName        String  @map("full_name") @db.VarChar(160)
+  username        String? @unique @db.VarChar(60)
+  email           String? @db.VarChar(254)
+  phone           String? @db.VarChar(32)
+  emergencyPhone  String? @map("emergency_phone") @db.VarChar(32)
+  avatarUrl       String? @map("avatar_url") @db.Text
+  passwordHash    String  @map("password_hash") @db.Text
+  status          String  @default("ACTIVE") @db.VarChar(20)
+  isPlatformAdmin Boolean @default(false) @map("is_platform_admin")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.DateTime(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.DateTime(6)
+
+  memberships TenantMembership[]
+
+  @@index([status])
+  @@map("users")
+}
+
+// ==========================================
+// 3. TENANT MEMBERSHIPS
+// ==========================================
+
+model TenantMembership {
+  id               String @id @default(uuid()) @db.VarChar(36)
+  tenantId         String @map("tenant_id") @db.VarChar(36)
+  userId           String @map("user_id") @db.VarChar(36)
+  membershipStatus String @default("ACTIVE") @map("membership_status") @db.VarChar(20)
+
+  joinedAt  DateTime? @map("joined_at") @db.DateTime(6)
+  createdAt DateTime  @default(now()) @map("created_at") @db.DateTime(6)
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.DateTime(6)
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  membershipRoles     MembershipRole[]
+  auditLogs           AuditLog[]
+  activityAssignments ActivityAssignment[]
+  createdDprs         DailyProgressReport[] @relation("DprCreator")
+  reviewedDprs        DailyProgressReport[] @relation("DprReviewer")
+  siteSubmissions     SiteSubmission[]      @relation("SiteSubmissionSupervisor")
+  attendanceSessions  AttendanceSession[]   @relation("AttendanceSupervisor")
+
+  @@unique([tenantId, userId])
+  @@unique([tenantId, id])
+  @@index([userId])
+  @@index([tenantId, membershipStatus])
+  @@map("tenant_memberships")
+}
+
+// ==========================================
+// 4. PERMISSIONS - GLOBAL CATALOGUE
+// ==========================================
+
+model Permission {
+  id            String  @id @default(uuid()) @db.VarChar(36)
+  permissionKey String  @unique @map("permission_key") @db.VarChar(120)
+  description   String? @db.VarChar(255)
+
+  rolePermissions RolePermission[]
+
+  @@map("permissions")
+}
+
+// ==========================================
+// 5. ROLES - TENANT SCOPED
+// ==========================================
+
+model Role {
+  id           String  @id @default(uuid()) @db.VarChar(36)
+  tenantId     String  @map("tenant_id") @db.VarChar(36)
+  name         String  @db.VarChar(80)
+  description  String? @db.VarChar(255)
+  isSystemRole Boolean @default(false) @map("is_system_role")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.DateTime(6)
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+
+  rolePermissions RolePermission[]
+  membershipRoles MembershipRole[]
+
+  @@unique([tenantId, id])
+  @@index([tenantId])
+  @@map("roles")
+}
+
+// ==========================================
+// 6. ROLE PERMISSIONS
+// ==========================================
+
+model RolePermission {
+  tenantId     String @map("tenant_id") @db.VarChar(36)
+  roleId       String @map("role_id") @db.VarChar(36)
+  permissionId String @map("permission_id") @db.VarChar(36)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.DateTime(6)
+
+  role Role @relation(fields: [tenantId, roleId], references: [tenantId, id], onDelete: Cascade)
+
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Restrict)
+
+  @@id([tenantId, roleId, permissionId])
+  @@index([permissionId])
+  @@map("role_permissions")
+}
+
+// ==========================================
+// 7. MEMBERSHIP ROLES
+// ==========================================
+
+model MembershipRole {
+  tenantId           String @map("tenant_id") @db.VarChar(36)
+  tenantMembershipId String @map("tenant_membership_id") @db.VarChar(36)
+  roleId             String @map("role_id") @db.VarChar(36)
+
+  assignedAt DateTime @default(now()) @map("assigned_at") @db.DateTime(6)
+
+  membership TenantMembership @relation(fields: [tenantId, tenantMembershipId], references: [tenantId, id], onDelete: Cascade)
+
+  role Role @relation(fields: [tenantId, roleId], references: [tenantId, id], onDelete: Cascade)
+
+  @@id([tenantId, tenantMembershipId, roleId])
+  @@index([tenantId, roleId])
+  @@map("membership_roles")
+}
+
+// ==========================================
+// 8. AUDIT LOGS
+// ==========================================
+
+model AuditLog {
+  id                String  @id @default(uuid()) @db.VarChar(36)
+  tenantId          String  @map("tenant_id") @db.VarChar(36)
+  actorMembershipId String? @map("actor_membership_id") @db.VarChar(36)
+
+  action     String  @db.VarChar(120)
+  entityType String  @map("entity_type") @db.VarChar(80)
+  entityId   String? @map("entity_id") @db.VarChar(36)
+
+  occurredAt    DateTime @default(now()) @map("occurred_at") @db.DateTime(6)
+  correlationId String?  @map("correlation_id") @db.VarChar(36)
+  metadata      Json     @default("{}") @db.Json
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+
+  actorMembership TenantMembership? @relation(fields: [tenantId, actorMembershipId], references: [tenantId, id], onDelete: Restrict)
+
+  @@index([tenantId, occurredAt(sort: Desc)])
+  @@index([tenantId, entityType, entityId])
+  @@map("audit_logs")
+}
+
+// ==========================================
+// 9. PROJECTS
+// ==========================================
+
+model Project {
+  id          String  @id @default(uuid()) @db.VarChar(36)
+  tenantId    String  @map("tenant_id") @db.VarChar(36)
+  projectCode String  @map("project_code") @db.VarChar(40)
+  name        String  @db.VarChar(160)
+  description String? @db.Text
+  clientName  String? @map("client_name") @db.VarChar(160)
+  siteAddress String? @map("site_address") @db.Text
+
+  startChainage  String?  @map("start_chainage") @db.VarChar(50)
+  endChainage    String?  @map("end_chainage") @db.VarChar(50)
+  startLatitude  Decimal? @map("start_latitude") @db.Decimal(10, 7)
+  startLongitude Decimal? @map("start_longitude") @db.Decimal(10, 7)
+  endLatitude    Decimal? @map("end_latitude") @db.Decimal(10, 7)
+  endLongitude   Decimal? @map("end_longitude") @db.Decimal(10, 7)
+
+  status String   @default("PLANNING") @db.VarChar(30)
+  budget Decimal? @db.Decimal(14, 2)
+
+  startDate DateTime? @map("start_date") @db.Date
+  endDate   DateTime? @map("end_date") @db.Date
+
+  createdAt DateTime @default(now()) @map("created_at") @db.DateTime(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.DateTime(6)
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+
+  activities      Activity[]
+  dprs            DailyProgressReport[]
+  siteSubmissions SiteSubmission[]
+  attendanceSessions AttendanceSession[]
+
+  @@unique([tenantId, id])
+  @@unique([tenantId, projectCode])
+  @@index([tenantId, status])
+  @@index([tenantId, createdAt(sort: Desc)])
+  @@map("projects")
+}
+
+// ==========================================
+// 10. ACTIVITIES
+// ==========================================
+
+model Activity {
+  id        String @id @default(uuid()) @db.VarChar(36)
+  tenantId  String @map("tenant_id") @db.VarChar(36)
+  projectId String @map("project_id") @db.VarChar(36)
+  parentId  String? @map("parent_id") @db.VarChar(36)
+
+  activityCode String  @map("activity_code") @db.VarChar(40)
+  name         String  @db.VarChar(160)
+  description  String? @db.Text
+  unit         String? @db.VarChar(30)
+
+  status   String @default("NOT_STARTED") @db.VarChar(30)
+  priority String @default("MEDIUM") @db.VarChar(20)
+  progress Int    @default(0)
+
+  startDate   DateTime? @map("start_date") @db.Date
+  dueDate     DateTime? @map("due_date") @db.Date
+  completedAt DateTime? @map("completed_at") @db.DateTime(6)
+
+  estimatedCost Decimal? @map("estimated_cost") @db.Decimal(14, 2)
+  actualCost    Decimal? @map("actual_cost") @db.Decimal(14, 2)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.DateTime(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.DateTime(6)
+
+  tenant  Tenant  @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  project Project @relation(fields: [tenantId, projectId], references: [tenantId, id], onDelete: Restrict)
+  parent  Activity? @relation("ActivityHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  subactivities Activity[] @relation("ActivityHierarchy")
+
+  assignments              ActivityAssignment[]
+  siteSubmissionActivities SiteSubmissionActivity[]
+
+  @@unique([tenantId, id])
+  @@unique([tenantId, projectId, activityCode])
+  @@index([tenantId, projectId, status])
+  @@index([tenantId, status])
+  @@index([tenantId, dueDate])
+  @@map("activities")
+}
+
+// ==========================================
+// 11. ACTIVITY ASSIGNMENTS
+// ==========================================
+
+model ActivityAssignment {
+  tenantId           String @map("tenant_id") @db.VarChar(36)
+  activityId         String @map("activity_id") @db.VarChar(36)
+  tenantMembershipId String @map("tenant_membership_id") @db.VarChar(36)
+
+  assignedAt DateTime @default(now()) @map("assigned_at") @db.DateTime(6)
+
+  activity Activity @relation(fields: [tenantId, activityId], references: [tenantId, id], onDelete: Cascade)
+
+  membership TenantMembership @relation(fields: [tenantId, tenantMembershipId], references: [tenantId, id], onDelete: Restrict)
+
+  @@id([tenantId, activityId, tenantMembershipId])
+  @@index([tenantId, tenantMembershipId])
+  @@map("activity_assignments")
+}
+
+model DailyProgressReport {
+  id         String   @id @default(uuid()) @db.VarChar(36)
+  tenantId   String   @map("tenant_id") @db.VarChar(36)
+  projectId  String   @map("project_id") @db.VarChar(36)
+  reportDate DateTime @map("report_date") @db.Date
+
+  status String @default("DRAFT") @db.VarChar(20)
+
+  weather        String? @db.VarChar(120)
+  siteConditions String? @map("site_conditions") @db.Text
+  workforceCount Int     @default(0) @map("workforce_count")
+
+  labour       Json @default("[]") @db.Json
+  equipment    Json @default("[]") @db.Json
+  materials    Json @default("[]") @db.Json
+  workProgress Json @default("[]") @map("work_progress") @db.Json
+  attachments  Json @default("[]") @db.Json
+
+  delays  String? @db.Text
+  issues  String? @db.Text
+  remarks String? @db.Text
+
+  preparedByMembershipId String  @map("prepared_by_membership_id") @db.VarChar(36)
+  reviewedByMembershipId String? @map("reviewed_by_membership_id") @db.VarChar(36)
+  reviewRemarks          String? @map("review_remarks") @db.Text
+
+  submittedAt DateTime? @map("submitted_at") @db.DateTime(6)
+  reviewedAt  DateTime? @map("reviewed_at") @db.DateTime(6)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.DateTime(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.DateTime(6)
+
+  tenant  Tenant  @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  project Project @relation(fields: [tenantId, projectId], references: [tenantId, id], onDelete: Restrict)
+
+  preparedBy TenantMembership  @relation("DprCreator", fields: [tenantId, preparedByMembershipId], references: [tenantId, id], onDelete: Restrict)
+  reviewedBy TenantMembership? @relation("DprReviewer", fields: [tenantId, reviewedByMembershipId], references: [tenantId, id], onDelete: Restrict)
+
+  @@unique([tenantId, id])
+  @@unique([tenantId, projectId, reportDate])
+  @@index([tenantId, projectId, reportDate(sort: Desc)])
+  @@index([tenantId, status])
+  @@map("daily_progress_reports")
+}
+
+// ==========================================
+// SITE SUBMISSIONS - MVP
+// ==========================================
+
+model SiteSubmission {
+  id                     String @id @default(uuid()) @db.VarChar(36)
+  tenantId               String @map("tenant_id") @db.VarChar(36)
+  projectId              String @map("project_id") @db.VarChar(36)
+  supervisorMembershipId String @map("supervisor_membership_id") @db.VarChar(36)
+
+  startChainage String @map("start_chainage") @db.VarChar(50)
+  endChainage   String @map("end_chainage") @db.VarChar(50)
+
+  latitude           Decimal   @db.Decimal(10, 7)
+  longitude          Decimal   @db.Decimal(10, 7)
+  locationAccuracyM  Decimal?  @map("location_accuracy_m") @db.Decimal(8, 2)
+  locationCapturedAt DateTime? @map("location_captured_at") @db.DateTime(6)
+
+  remarks     String?  @db.Text
+  submittedAt DateTime @default(now()) @map("submitted_at") @db.DateTime(6)
+  createdAt   DateTime @default(now()) @map("created_at") @db.DateTime(6)
+
+  tenant     Tenant           @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  project    Project          @relation(fields: [tenantId, projectId], references: [tenantId, id], onDelete: Restrict)
+  supervisor TenantMembership @relation("SiteSubmissionSupervisor", fields: [tenantId, supervisorMembershipId], references: [tenantId, id], onDelete: Restrict)
+
+  activities SiteSubmissionActivity[]
+  photos     SiteSubmissionPhoto[]
+
+  @@unique([tenantId, id])
+  @@index([tenantId, projectId, submittedAt(sort: Desc)])
+  @@index([tenantId, supervisorMembershipId, submittedAt(sort: Desc)])
+  @@map("site_submissions")
+}
+
+model SiteSubmissionActivity {
+  tenantId     String @map("tenant_id") @db.VarChar(36)
+  submissionId String @map("submission_id") @db.VarChar(36)
+  activityId   String @map("activity_id") @db.VarChar(36)
+
+  submission SiteSubmission @relation(fields: [tenantId, submissionId], references: [tenantId, id], onDelete: Cascade)
+  activity   Activity       @relation(fields: [tenantId, activityId], references: [tenantId, id], onDelete: Restrict)
+
+  @@id([tenantId, submissionId, activityId])
+  @@index([tenantId, activityId])
+  @@map("site_submission_activities")
+}
+
+model SiteSubmissionPhoto {
+  id           String @id @default(uuid()) @db.VarChar(36)
+  tenantId     String @map("tenant_id") @db.VarChar(36)
+  submissionId String @map("submission_id") @db.VarChar(36)
+
+  storageKey String    @map("storage_key") @db.VarChar(500)
+  mimeType   String    @map("mime_type") @db.VarChar(100)
+  fileSize   Int       @map("file_size")
+  capturedAt DateTime? @map("captured_at") @db.DateTime(6)
+  uploadedAt DateTime  @default(now()) @map("uploaded_at") @db.DateTime(6)
+
+  submission SiteSubmission @relation(fields: [tenantId, submissionId], references: [tenantId, id], onDelete: Cascade)
+
+  @@unique([tenantId, id])
+  @@index([tenantId, submissionId])
+  @@map("site_submission_photos")
+}
+
+// ==========================================
+// ATTENDANCE SESSIONS - WORKFORCE TOOL
+// ==========================================
+
+model AttendanceSession {
+  id                     String    @id @default(uuid()) @db.VarChar(36)
+  tenantId               String    @map("tenant_id") @db.VarChar(36)
+  supervisorMembershipId String    @map("supervisor_membership_id") @db.VarChar(36)
+  projectId              String    @map("project_id") @db.VarChar(36)
+
+  checkInAt              DateTime  @default(now()) @map("check_in_at") @db.DateTime(6)
+  checkOutAt             DateTime? @map("check_out_at") @db.DateTime(6)
+
+  latitude               Decimal?  @db.Decimal(10, 7)
+  longitude              Decimal?  @db.Decimal(10, 7)
+  locationAccuracyM      Decimal?  @map("location_accuracy_m") @db.Decimal(8, 2)
+  checkOutLatitude       Decimal?  @map("checkout_latitude") @db.Decimal(10, 7)
+  checkOutLongitude      Decimal?  @map("checkout_longitude") @db.Decimal(10, 7)
+  checkOutAccuracyM      Decimal?  @map("checkout_accuracy_m") @db.Decimal(8, 2)
+  status                 String    @default("OPEN") @db.VarChar(20)
+  remarks                String?   @db.Text
+
+  createdAt              DateTime  @default(now()) @map("created_at") @db.DateTime(6)
+  updatedAt              DateTime  @updatedAt @map("updated_at") @db.DateTime(6)
+
+  tenant     Tenant           @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  project    Project          @relation(fields: [tenantId, projectId], references: [tenantId, id], onDelete: Restrict)
+  supervisor TenantMembership @relation("AttendanceSupervisor", fields: [tenantId, supervisorMembershipId], references: [tenantId, id], onDelete: Restrict)
+
+  @@unique([tenantId, id])
+  @@index([tenantId, supervisorMembershipId, status])
+  @@index([tenantId, projectId, checkInAt(sort: Desc)])
+  @@map("attendance_sessions")
+}
+
