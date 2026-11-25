@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 // apps/web/server.js - cPanel Phusion Passenger entrypoint for Next.js
 const { createServer } = require('http');
 const { parse } = require('url');

@@ -1,4 +1,4 @@
-// apps/api/server.js - cPanel Phusion Passenger entrypoint for NestJS API
+/* eslint-disable @typescript-eslint/no-require-imports */// apps/api/server.js - cPanel Phusion Passenger entrypoint for NestJS API
 const path = require('path');
 const fs = require('fs');
 
