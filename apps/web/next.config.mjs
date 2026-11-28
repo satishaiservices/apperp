@@ -2,7 +2,28 @@
  *  and Next.js must transpile a next.config.ts at every server start. */
 
 
+// Strict CSP for production. Next.js injects inline bootstrap scripts, so
+// 'unsafe-inline' is needed for scripts without a nonce setup; everything else
+// is limited to this origin. Development needs eval + the local API port.
+const isProd = process.env.NODE_ENV === 'production';
+const contentSecurityPolicy = [
+  "default-src 'self'",
+  `script-src 'self' 'unsafe-inline'${isProd ? '' : " 'unsafe-eval'"}`,
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob:",
+  "font-src 'self' data:",
+  `connect-src 'self'${isProd ? '' : ' http://localhost:3001 http://127.0.0.1:3001 ws:'}`,
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+].join('; ');
+
 const securityHeaders = [
+  {
+    key: 'Content-Security-Policy',
+    value: contentSecurityPolicy,
+  },
   {
     key: 'X-DNS-Prefetch-Control',
     value: 'on',

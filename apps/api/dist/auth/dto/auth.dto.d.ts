@@ -20,5 +20,9 @@ export declare class RegisterDto {
     tenantName: string;
 }
 export declare class RefreshTokenDto {
-    refreshToken: string;
+    refreshToken?: string;
+}
+export declare class ChangePasswordDto {
+    currentPassword: string;
+    newPassword: string;
 }

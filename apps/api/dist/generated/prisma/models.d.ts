@@ -14,4 +14,5 @@ export type * from './models/SiteSubmission.js';
 export type * from './models/SiteSubmissionActivity.js';
 export type * from './models/SiteSubmissionPhoto.js';
 export type * from './models/AttendanceSession.js';
+export type * from './models/PasswordResetCode.js';
 export type * from './commonInputTypes.js';

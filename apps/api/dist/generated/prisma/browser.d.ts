@@ -18,3 +18,4 @@ export type SiteSubmission = Prisma.SiteSubmissionModel;
 export type SiteSubmissionActivity = Prisma.SiteSubmissionActivityModel;
 export type SiteSubmissionPhoto = Prisma.SiteSubmissionPhotoModel;
 export type AttendanceSession = Prisma.AttendanceSessionModel;
+export type PasswordResetCode = Prisma.PasswordResetCodeModel;

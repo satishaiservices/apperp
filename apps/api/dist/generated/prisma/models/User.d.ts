@@ -3,8 +3,18 @@ import type * as Prisma from "../internal/prismaNamespace.js";
 export type UserModel = runtime.Types.Result.DefaultSelection<Prisma.$UserPayload>;
 export type AggregateUser = {
     _count: UserCountAggregateOutputType | null;
+    _avg: UserAvgAggregateOutputType | null;
+    _sum: UserSumAggregateOutputType | null;
     _min: UserMinAggregateOutputType | null;
     _max: UserMaxAggregateOutputType | null;
+};
+export type UserAvgAggregateOutputType = {
+    tokenVersion: number | null;
+    failedLoginCount: number | null;
+};
+export type UserSumAggregateOutputType = {
+    tokenVersion: number | null;
+    failedLoginCount: number | null;
 };
 export type UserMinAggregateOutputType = {
     id: string | null;
@@ -17,6 +27,10 @@ export type UserMinAggregateOutputType = {
     passwordHash: string | null;
     status: string | null;
     isPlatformAdmin: boolean | null;
+    tokenVersion: number | null;
+    mustChangePassword: boolean | null;
+    failedLoginCount: number | null;
+    lockedUntil: Date | null;
     createdAt: Date | null;
     updatedAt: Date | null;
 };
@@ -31,6 +45,10 @@ export type UserMaxAggregateOutputType = {
     passwordHash: string | null;
     status: string | null;
     isPlatformAdmin: boolean | null;
+    tokenVersion: number | null;
+    mustChangePassword: boolean | null;
+    failedLoginCount: number | null;
+    lockedUntil: Date | null;
     createdAt: Date | null;
     updatedAt: Date | null;
 };
@@ -45,9 +63,21 @@ export type UserCountAggregateOutputType = {
     passwordHash: number;
     status: number;
     isPlatformAdmin: number;
+    tokenVersion: number;
+    mustChangePassword: number;
+    failedLoginCount: number;
+    lockedUntil: number;
     createdAt: number;
     updatedAt: number;
     _all: number;
+};
+export type UserAvgAggregateInputType = {
+    tokenVersion?: true;
+    failedLoginCount?: true;
+};
+export type UserSumAggregateInputType = {
+    tokenVersion?: true;
+    failedLoginCount?: true;
 };
 export type UserMinAggregateInputType = {
     id?: true;
@@ -60,6 +90,10 @@ export type UserMinAggregateInputType = {
     passwordHash?: true;
     status?: true;
     isPlatformAdmin?: true;
+    tokenVersion?: true;
+    mustChangePassword?: true;
+    failedLoginCount?: true;
+    lockedUntil?: true;
     createdAt?: true;
     updatedAt?: true;
 };
@@ -74,6 +108,10 @@ export type UserMaxAggregateInputType = {
     passwordHash?: true;
     status?: true;
     isPlatformAdmin?: true;
+    tokenVersion?: true;
+    mustChangePassword?: true;
+    failedLoginCount?: true;
+    lockedUntil?: true;
     createdAt?: true;
     updatedAt?: true;
 };
@@ -88,6 +126,10 @@ export type UserCountAggregateInputType = {
     passwordHash?: true;
     status?: true;
     isPlatformAdmin?: true;
+    tokenVersion?: true;
+    mustChangePassword?: true;
+    failedLoginCount?: true;
+    lockedUntil?: true;
     createdAt?: true;
     updatedAt?: true;
     _all?: true;
@@ -99,6 +141,8 @@ export type UserAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
     take?: number;
     skip?: number;
     _count?: true | UserCountAggregateInputType;
+    _avg?: UserAvgAggregateInputType;
+    _sum?: UserSumAggregateInputType;
     _min?: UserMinAggregateInputType;
     _max?: UserMaxAggregateInputType;
 };
@@ -113,6 +157,8 @@ export type UserGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
     take?: number;
     skip?: number;
     _count?: UserCountAggregateInputType | true;
+    _avg?: UserAvgAggregateInputType;
+    _sum?: UserSumAggregateInputType;
     _min?: UserMinAggregateInputType;
     _max?: UserMaxAggregateInputType;
 };
@@ -127,9 +173,15 @@ export type UserGroupByOutputType = {
     passwordHash: string;
     status: string;
     isPlatformAdmin: boolean;
+    tokenVersion: number;
+    mustChangePassword: boolean;
+    failedLoginCount: number;
+    lockedUntil: Date | null;
     createdAt: Date;
     updatedAt: Date;
     _count: UserCountAggregateOutputType | null;
+    _avg: UserAvgAggregateOutputType | null;
+    _sum: UserSumAggregateOutputType | null;
     _min: UserMinAggregateOutputType | null;
     _max: UserMaxAggregateOutputType | null;
 };
@@ -150,9 +202,14 @@ export type UserWhereInput = {
     passwordHash?: Prisma.StringFilter<"User"> | string;
     status?: Prisma.StringFilter<"User"> | string;
     isPlatformAdmin?: Prisma.BoolFilter<"User"> | boolean;
+    tokenVersion?: Prisma.IntFilter<"User"> | number;
+    mustChangePassword?: Prisma.BoolFilter<"User"> | boolean;
+    failedLoginCount?: Prisma.IntFilter<"User"> | number;
+    lockedUntil?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null;
     createdAt?: Prisma.DateTimeFilter<"User"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string;
     memberships?: Prisma.TenantMembershipListRelationFilter;
+    passwordResetCodes?: Prisma.PasswordResetCodeListRelationFilter;
 };
 export type UserOrderByWithRelationInput = {
     id?: Prisma.SortOrder;
@@ -165,9 +222,14 @@ export type UserOrderByWithRelationInput = {
     passwordHash?: Prisma.SortOrder;
     status?: Prisma.SortOrder;
     isPlatformAdmin?: Prisma.SortOrder;
+    tokenVersion?: Prisma.SortOrder;
+    mustChangePassword?: Prisma.SortOrder;
+    failedLoginCount?: Prisma.SortOrder;
+    lockedUntil?: Prisma.SortOrderInput | Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
     memberships?: Prisma.TenantMembershipOrderByRelationAggregateInput;
+    passwordResetCodes?: Prisma.PasswordResetCodeOrderByRelationAggregateInput;
     _relevance?: Prisma.UserOrderByRelevanceInput;
 };
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -184,9 +246,14 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
     passwordHash?: Prisma.StringFilter<"User"> | string;
     status?: Prisma.StringFilter<"User"> | string;
     isPlatformAdmin?: Prisma.BoolFilter<"User"> | boolean;
+    tokenVersion?: Prisma.IntFilter<"User"> | number;
+    mustChangePassword?: Prisma.BoolFilter<"User"> | boolean;
+    failedLoginCount?: Prisma.IntFilter<"User"> | number;
+    lockedUntil?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null;
     createdAt?: Prisma.DateTimeFilter<"User"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string;
     memberships?: Prisma.TenantMembershipListRelationFilter;
+    passwordResetCodes?: Prisma.PasswordResetCodeListRelationFilter;
 }, "id" | "username">;
 export type UserOrderByWithAggregationInput = {
     id?: Prisma.SortOrder;
@@ -199,11 +266,17 @@ export type UserOrderByWithAggregationInput = {
     passwordHash?: Prisma.SortOrder;
     status?: Prisma.SortOrder;
     isPlatformAdmin?: Prisma.SortOrder;
+    tokenVersion?: Prisma.SortOrder;
+    mustChangePassword?: Prisma.SortOrder;
+    failedLoginCount?: Prisma.SortOrder;
+    lockedUntil?: Prisma.SortOrderInput | Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
     _count?: Prisma.UserCountOrderByAggregateInput;
+    _avg?: Prisma.UserAvgOrderByAggregateInput;
     _max?: Prisma.UserMaxOrderByAggregateInput;
     _min?: Prisma.UserMinOrderByAggregateInput;
+    _sum?: Prisma.UserSumOrderByAggregateInput;
 };
 export type UserScalarWhereWithAggregatesInput = {
     AND?: Prisma.UserScalarWhereWithAggregatesInput | Prisma.UserScalarWhereWithAggregatesInput[];
@@ -219,6 +292,10 @@ export type UserScalarWhereWithAggregatesInput = {
     passwordHash?: Prisma.StringWithAggregatesFilter<"User"> | string;
     status?: Prisma.StringWithAggregatesFilter<"User"> | string;
     isPlatformAdmin?: Prisma.BoolWithAggregatesFilter<"User"> | boolean;
+    tokenVersion?: Prisma.IntWithAggregatesFilter<"User"> | number;
+    mustChangePassword?: Prisma.BoolWithAggregatesFilter<"User"> | boolean;
+    failedLoginCount?: Prisma.IntWithAggregatesFilter<"User"> | number;
+    lockedUntil?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null;
     createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string;
     updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string;
 };
@@ -233,9 +310,14 @@ export type UserCreateInput = {
     passwordHash: string;
     status?: string;
     isPlatformAdmin?: boolean;
+    tokenVersion?: number;
+    mustChangePassword?: boolean;
+    failedLoginCount?: number;
+    lockedUntil?: Date | string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     memberships?: Prisma.TenantMembershipCreateNestedManyWithoutUserInput;
+    passwordResetCodes?: Prisma.PasswordResetCodeCreateNestedManyWithoutUserInput;
 };
 export type UserUncheckedCreateInput = {
     id?: string;
@@ -248,9 +330,14 @@ export type UserUncheckedCreateInput = {
     passwordHash: string;
     status?: string;
     isPlatformAdmin?: boolean;
+    tokenVersion?: number;
+    mustChangePassword?: boolean;
+    failedLoginCount?: number;
+    lockedUntil?: Date | string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
     memberships?: Prisma.TenantMembershipUncheckedCreateNestedManyWithoutUserInput;
+    passwordResetCodes?: Prisma.PasswordResetCodeUncheckedCreateNestedManyWithoutUserInput;
 };
 export type UserUpdateInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -263,9 +350,14 @@ export type UserUpdateInput = {
     passwordHash?: Prisma.StringFieldUpdateOperationsInput | string;
     status?: Prisma.StringFieldUpdateOperationsInput | string;
     isPlatformAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number;
+    mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    failedLoginCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     memberships?: Prisma.TenantMembershipUpdateManyWithoutUserNestedInput;
+    passwordResetCodes?: Prisma.PasswordResetCodeUpdateManyWithoutUserNestedInput;
 };
 export type UserUncheckedUpdateInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -278,9 +370,14 @@ export type UserUncheckedUpdateInput = {
     passwordHash?: Prisma.StringFieldUpdateOperationsInput | string;
     status?: Prisma.StringFieldUpdateOperationsInput | string;
     isPlatformAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number;
+    mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    failedLoginCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     memberships?: Prisma.TenantMembershipUncheckedUpdateManyWithoutUserNestedInput;
+    passwordResetCodes?: Prisma.PasswordResetCodeUncheckedUpdateManyWithoutUserNestedInput;
 };
 export type UserCreateManyInput = {
     id?: string;
@@ -293,6 +390,10 @@ export type UserCreateManyInput = {
     passwordHash: string;
     status?: string;
     isPlatformAdmin?: boolean;
+    tokenVersion?: number;
+    mustChangePassword?: boolean;
+    failedLoginCount?: number;
+    lockedUntil?: Date | string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
 };
@@ -307,6 +408,10 @@ export type UserUpdateManyMutationInput = {
     passwordHash?: Prisma.StringFieldUpdateOperationsInput | string;
     status?: Prisma.StringFieldUpdateOperationsInput | string;
     isPlatformAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number;
+    mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    failedLoginCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
 };
@@ -321,6 +426,10 @@ export type UserUncheckedUpdateManyInput = {
     passwordHash?: Prisma.StringFieldUpdateOperationsInput | string;
     status?: Prisma.StringFieldUpdateOperationsInput | string;
     isPlatformAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number;
+    mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    failedLoginCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
 };
@@ -340,8 +449,16 @@ export type UserCountOrderByAggregateInput = {
     passwordHash?: Prisma.SortOrder;
     status?: Prisma.SortOrder;
     isPlatformAdmin?: Prisma.SortOrder;
+    tokenVersion?: Prisma.SortOrder;
+    mustChangePassword?: Prisma.SortOrder;
+    failedLoginCount?: Prisma.SortOrder;
+    lockedUntil?: Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
+};
+export type UserAvgOrderByAggregateInput = {
+    tokenVersion?: Prisma.SortOrder;
+    failedLoginCount?: Prisma.SortOrder;
 };
 export type UserMaxOrderByAggregateInput = {
     id?: Prisma.SortOrder;
@@ -354,6 +471,10 @@ export type UserMaxOrderByAggregateInput = {
     passwordHash?: Prisma.SortOrder;
     status?: Prisma.SortOrder;
     isPlatformAdmin?: Prisma.SortOrder;
+    tokenVersion?: Prisma.SortOrder;
+    mustChangePassword?: Prisma.SortOrder;
+    failedLoginCount?: Prisma.SortOrder;
+    lockedUntil?: Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
 };
@@ -368,8 +489,16 @@ export type UserMinOrderByAggregateInput = {
     passwordHash?: Prisma.SortOrder;
     status?: Prisma.SortOrder;
     isPlatformAdmin?: Prisma.SortOrder;
+    tokenVersion?: Prisma.SortOrder;
+    mustChangePassword?: Prisma.SortOrder;
+    failedLoginCount?: Prisma.SortOrder;
+    lockedUntil?: Prisma.SortOrder;
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
+};
+export type UserSumOrderByAggregateInput = {
+    tokenVersion?: Prisma.SortOrder;
+    failedLoginCount?: Prisma.SortOrder;
 };
 export type UserScalarRelationFilter = {
     is?: Prisma.UserWhereInput;
@@ -380,6 +509,16 @@ export type NullableStringFieldUpdateOperationsInput = {
 };
 export type BoolFieldUpdateOperationsInput = {
     set?: boolean;
+};
+export type IntFieldUpdateOperationsInput = {
+    set?: number;
+    increment?: number;
+    decrement?: number;
+    multiply?: number;
+    divide?: number;
+};
+export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null;
 };
 export type UserCreateNestedOneWithoutMembershipsInput = {
     create?: Prisma.XOR<Prisma.UserCreateWithoutMembershipsInput, Prisma.UserUncheckedCreateWithoutMembershipsInput>;
@@ -393,6 +532,18 @@ export type UserUpdateOneRequiredWithoutMembershipsNestedInput = {
     connect?: Prisma.UserWhereUniqueInput;
     update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutMembershipsInput, Prisma.UserUpdateWithoutMembershipsInput>, Prisma.UserUncheckedUpdateWithoutMembershipsInput>;
 };
+export type UserCreateNestedOneWithoutPasswordResetCodesInput = {
+    create?: Prisma.XOR<Prisma.UserCreateWithoutPasswordResetCodesInput, Prisma.UserUncheckedCreateWithoutPasswordResetCodesInput>;
+    connectOrCreate?: Prisma.UserCreateOrConnectWithoutPasswordResetCodesInput;
+    connect?: Prisma.UserWhereUniqueInput;
+};
+export type UserUpdateOneRequiredWithoutPasswordResetCodesNestedInput = {
+    create?: Prisma.XOR<Prisma.UserCreateWithoutPasswordResetCodesInput, Prisma.UserUncheckedCreateWithoutPasswordResetCodesInput>;
+    connectOrCreate?: Prisma.UserCreateOrConnectWithoutPasswordResetCodesInput;
+    upsert?: Prisma.UserUpsertWithoutPasswordResetCodesInput;
+    connect?: Prisma.UserWhereUniqueInput;
+    update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPasswordResetCodesInput, Prisma.UserUpdateWithoutPasswordResetCodesInput>, Prisma.UserUncheckedUpdateWithoutPasswordResetCodesInput>;
+};
 export type UserCreateWithoutMembershipsInput = {
     id?: string;
     fullName: string;
@@ -404,8 +555,13 @@ export type UserCreateWithoutMembershipsInput = {
     passwordHash: string;
     status?: string;
     isPlatformAdmin?: boolean;
+    tokenVersion?: number;
+    mustChangePassword?: boolean;
+    failedLoginCount?: number;
+    lockedUntil?: Date | string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
+    passwordResetCodes?: Prisma.PasswordResetCodeCreateNestedManyWithoutUserInput;
 };
 export type UserUncheckedCreateWithoutMembershipsInput = {
     id?: string;
@@ -418,8 +574,13 @@ export type UserUncheckedCreateWithoutMembershipsInput = {
     passwordHash: string;
     status?: string;
     isPlatformAdmin?: boolean;
+    tokenVersion?: number;
+    mustChangePassword?: boolean;
+    failedLoginCount?: number;
+    lockedUntil?: Date | string | null;
     createdAt?: Date | string;
     updatedAt?: Date | string;
+    passwordResetCodes?: Prisma.PasswordResetCodeUncheckedCreateNestedManyWithoutUserInput;
 };
 export type UserCreateOrConnectWithoutMembershipsInput = {
     where: Prisma.UserWhereUniqueInput;
@@ -445,8 +606,13 @@ export type UserUpdateWithoutMembershipsInput = {
     passwordHash?: Prisma.StringFieldUpdateOperationsInput | string;
     status?: Prisma.StringFieldUpdateOperationsInput | string;
     isPlatformAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number;
+    mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    failedLoginCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    passwordResetCodes?: Prisma.PasswordResetCodeUpdateManyWithoutUserNestedInput;
 };
 export type UserUncheckedUpdateWithoutMembershipsInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -459,20 +625,119 @@ export type UserUncheckedUpdateWithoutMembershipsInput = {
     passwordHash?: Prisma.StringFieldUpdateOperationsInput | string;
     status?: Prisma.StringFieldUpdateOperationsInput | string;
     isPlatformAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number;
+    mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    failedLoginCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    passwordResetCodes?: Prisma.PasswordResetCodeUncheckedUpdateManyWithoutUserNestedInput;
+};
+export type UserCreateWithoutPasswordResetCodesInput = {
+    id?: string;
+    fullName: string;
+    username?: string | null;
+    email?: string | null;
+    phone?: string | null;
+    emergencyPhone?: string | null;
+    avatarUrl?: string | null;
+    passwordHash: string;
+    status?: string;
+    isPlatformAdmin?: boolean;
+    tokenVersion?: number;
+    mustChangePassword?: boolean;
+    failedLoginCount?: number;
+    lockedUntil?: Date | string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    memberships?: Prisma.TenantMembershipCreateNestedManyWithoutUserInput;
+};
+export type UserUncheckedCreateWithoutPasswordResetCodesInput = {
+    id?: string;
+    fullName: string;
+    username?: string | null;
+    email?: string | null;
+    phone?: string | null;
+    emergencyPhone?: string | null;
+    avatarUrl?: string | null;
+    passwordHash: string;
+    status?: string;
+    isPlatformAdmin?: boolean;
+    tokenVersion?: number;
+    mustChangePassword?: boolean;
+    failedLoginCount?: number;
+    lockedUntil?: Date | string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    memberships?: Prisma.TenantMembershipUncheckedCreateNestedManyWithoutUserInput;
+};
+export type UserCreateOrConnectWithoutPasswordResetCodesInput = {
+    where: Prisma.UserWhereUniqueInput;
+    create: Prisma.XOR<Prisma.UserCreateWithoutPasswordResetCodesInput, Prisma.UserUncheckedCreateWithoutPasswordResetCodesInput>;
+};
+export type UserUpsertWithoutPasswordResetCodesInput = {
+    update: Prisma.XOR<Prisma.UserUpdateWithoutPasswordResetCodesInput, Prisma.UserUncheckedUpdateWithoutPasswordResetCodesInput>;
+    create: Prisma.XOR<Prisma.UserCreateWithoutPasswordResetCodesInput, Prisma.UserUncheckedCreateWithoutPasswordResetCodesInput>;
+    where?: Prisma.UserWhereInput;
+};
+export type UserUpdateToOneWithWhereWithoutPasswordResetCodesInput = {
+    where?: Prisma.UserWhereInput;
+    data: Prisma.XOR<Prisma.UserUpdateWithoutPasswordResetCodesInput, Prisma.UserUncheckedUpdateWithoutPasswordResetCodesInput>;
+};
+export type UserUpdateWithoutPasswordResetCodesInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    fullName?: Prisma.StringFieldUpdateOperationsInput | string;
+    username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    emergencyPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    passwordHash?: Prisma.StringFieldUpdateOperationsInput | string;
+    status?: Prisma.StringFieldUpdateOperationsInput | string;
+    isPlatformAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number;
+    mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    failedLoginCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    memberships?: Prisma.TenantMembershipUpdateManyWithoutUserNestedInput;
+};
+export type UserUncheckedUpdateWithoutPasswordResetCodesInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    fullName?: Prisma.StringFieldUpdateOperationsInput | string;
+    username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    emergencyPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    passwordHash?: Prisma.StringFieldUpdateOperationsInput | string;
+    status?: Prisma.StringFieldUpdateOperationsInput | string;
+    isPlatformAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    tokenVersion?: Prisma.IntFieldUpdateOperationsInput | number;
+    mustChangePassword?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    failedLoginCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    memberships?: Prisma.TenantMembershipUncheckedUpdateManyWithoutUserNestedInput;
 };
 export type UserCountOutputType = {
     memberships: number;
+    passwordResetCodes: number;
 };
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     memberships?: boolean | UserCountOutputTypeCountMembershipsArgs;
+    passwordResetCodes?: boolean | UserCountOutputTypeCountPasswordResetCodesArgs;
 };
 export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.UserCountOutputTypeSelect<ExtArgs> | null;
 };
 export type UserCountOutputTypeCountMembershipsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     where?: Prisma.TenantMembershipWhereInput;
+};
+export type UserCountOutputTypeCountPasswordResetCodesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.PasswordResetCodeWhereInput;
 };
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
     id?: boolean;
@@ -485,9 +750,14 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
     passwordHash?: boolean;
     status?: boolean;
     isPlatformAdmin?: boolean;
+    tokenVersion?: boolean;
+    mustChangePassword?: boolean;
+    failedLoginCount?: boolean;
+    lockedUntil?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
     memberships?: boolean | Prisma.User$membershipsArgs<ExtArgs>;
+    passwordResetCodes?: boolean | Prisma.User$passwordResetCodesArgs<ExtArgs>;
     _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>;
 }, ExtArgs["result"]["user"]>;
 export type UserSelectScalar = {
@@ -501,18 +771,24 @@ export type UserSelectScalar = {
     passwordHash?: boolean;
     status?: boolean;
     isPlatformAdmin?: boolean;
+    tokenVersion?: boolean;
+    mustChangePassword?: boolean;
+    failedLoginCount?: boolean;
+    lockedUntil?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
 };
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "fullName" | "username" | "email" | "phone" | "emergencyPhone" | "avatarUrl" | "passwordHash" | "status" | "isPlatformAdmin" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>;
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "fullName" | "username" | "email" | "phone" | "emergencyPhone" | "avatarUrl" | "passwordHash" | "status" | "isPlatformAdmin" | "tokenVersion" | "mustChangePassword" | "failedLoginCount" | "lockedUntil" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>;
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     memberships?: boolean | Prisma.User$membershipsArgs<ExtArgs>;
+    passwordResetCodes?: boolean | Prisma.User$passwordResetCodesArgs<ExtArgs>;
     _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>;
 };
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     name: "User";
     objects: {
         memberships: Prisma.$TenantMembershipPayload<ExtArgs>[];
+        passwordResetCodes: Prisma.$PasswordResetCodePayload<ExtArgs>[];
     };
     scalars: runtime.Types.Extensions.GetPayloadResult<{
         id: string;
@@ -525,6 +801,10 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
         passwordHash: string;
         status: string;
         isPlatformAdmin: boolean;
+        tokenVersion: number;
+        mustChangePassword: boolean;
+        failedLoginCount: number;
+        lockedUntil: Date | null;
         createdAt: Date;
         updatedAt: Date;
     }, ExtArgs["result"]["user"]>;
@@ -578,6 +858,7 @@ export interface UserDelegate<ExtArgs extends runtime.Types.Extensions.InternalA
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise";
     memberships<T extends Prisma.User$membershipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$membershipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TenantMembershipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
+    passwordResetCodes<T extends Prisma.User$passwordResetCodesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$passwordResetCodesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PasswordResetCodePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): runtime.Types.Utils.JsPromise<TResult1 | TResult2>;
     catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): runtime.Types.Utils.JsPromise<T | TResult>;
     finally(onfinally?: (() => void) | undefined | null): runtime.Types.Utils.JsPromise<T>;
@@ -593,6 +874,10 @@ export interface UserFieldRefs {
     readonly passwordHash: Prisma.FieldRef<"User", 'String'>;
     readonly status: Prisma.FieldRef<"User", 'String'>;
     readonly isPlatformAdmin: Prisma.FieldRef<"User", 'Boolean'>;
+    readonly tokenVersion: Prisma.FieldRef<"User", 'Int'>;
+    readonly mustChangePassword: Prisma.FieldRef<"User", 'Boolean'>;
+    readonly failedLoginCount: Prisma.FieldRef<"User", 'Int'>;
+    readonly lockedUntil: Prisma.FieldRef<"User", 'DateTime'>;
     readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>;
     readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>;
 }
@@ -691,6 +976,17 @@ export type User$membershipsArgs<ExtArgs extends runtime.Types.Extensions.Intern
     take?: number;
     skip?: number;
     distinct?: Prisma.TenantMembershipScalarFieldEnum | Prisma.TenantMembershipScalarFieldEnum[];
+};
+export type User$passwordResetCodesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    select?: Prisma.PasswordResetCodeSelect<ExtArgs> | null;
+    omit?: Prisma.PasswordResetCodeOmit<ExtArgs> | null;
+    include?: Prisma.PasswordResetCodeInclude<ExtArgs> | null;
+    where?: Prisma.PasswordResetCodeWhereInput;
+    orderBy?: Prisma.PasswordResetCodeOrderByWithRelationInput | Prisma.PasswordResetCodeOrderByWithRelationInput[];
+    cursor?: Prisma.PasswordResetCodeWhereUniqueInput;
+    take?: number;
+    skip?: number;
+    distinct?: Prisma.PasswordResetCodeScalarFieldEnum | Prisma.PasswordResetCodeScalarFieldEnum[];
 };
 export type UserDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     select?: Prisma.UserSelect<ExtArgs> | null;

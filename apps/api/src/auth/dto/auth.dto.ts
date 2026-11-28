@@ -61,7 +61,18 @@ export class RegisterDto {
 }
 
 export class RefreshTokenDto {
+  // Optional: browser clients send it in an httpOnly cookie instead.
+  @IsOptional()
   @IsString()
-  @IsNotEmpty({ message: 'Refresh token is required' })
-  refreshToken!: string;
+  refreshToken?: string;
+}
+
+export class ChangePasswordDto {
+  @IsString()
+  @IsNotEmpty({ message: 'Current password is required' })
+  currentPassword!: string;
+
+  @IsString()
+  @MinLength(10, { message: 'Password must contain at least 10 characters' })
+  newPassword!: string;
 }

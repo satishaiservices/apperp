@@ -6,9 +6,11 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { hash } from '@node-rs/argon2';
+import { generateTemporaryPassword } from '../common/utils/temporary-password.util';
 import { randomUUID } from 'crypto';
 import { PrismaService } from '../database/prisma.service';
 import { AuditService } from '../audit/audit.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import type { AuthenticatedUser } from '../auth/jwt-auth.guard';
 
 export interface CreateTenantInput {
@@ -384,13 +386,23 @@ export class PlatformService {
 
     if (!membership) throw new NotFoundException('User is not a member of this organization');
 
-    const pass = newPassword?.trim() || `Pass${Math.random().toString(36).substring(2, 8)}!`;
+    const pass = newPassword?.trim() || generateTemporaryPassword();
+    if (pass.length < 10) {
+      throw new BadRequestException('Password must be at least 10 characters');
+    }
     const passwordHash = await hash(pass);
 
     await this.prisma.user.update({
       where: { id: userId },
-      data: { passwordHash },
+      data: {
+        passwordHash,
+        mustChangePassword: true,
+        tokenVersion: { increment: 1 },
+        failedLoginCount: 0,
+        lockedUntil: null,
+      },
     });
+    JwtAuthGuard.invalidateUser(userId);
 
     return {
       message: 'Password reset successfully',
@@ -666,10 +678,15 @@ export class PlatformService {
     }
 
     if (input.newPassword?.trim()) {
-      if (input.newPassword.trim().length < 8) {
-        throw new BadRequestException('Password must be at least 8 characters long');
+      if (input.newPassword.trim().length < 10) {
+        throw new BadRequestException('Password must be at least 10 characters long');
       }
       data.passwordHash = await hash(input.newPassword.trim());
+    }
+
+    // Password or status changes revoke the account's existing sessions.
+    if (data.passwordHash || (input.status && input.status !== user.status)) {
+      data.tokenVersion = { increment: 1 };
     }
 
     const updated = await this.prisma.user.update({
@@ -686,6 +703,8 @@ export class PlatformService {
         updatedAt: true,
       },
     });
+
+    JwtAuthGuard.invalidateUser(id);
 
     await this.audit.log(auth, 'SUPERADMIN_UPDATED', 'User', id, {
       updatedFields: Object.keys(data).filter((k) => k !== 'passwordHash'),

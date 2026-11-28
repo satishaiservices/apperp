@@ -27,6 +27,7 @@ export declare const ModelName: {
     readonly SiteSubmissionActivity: "SiteSubmissionActivity";
     readonly SiteSubmissionPhoto: "SiteSubmissionPhoto";
     readonly AttendanceSession: "AttendanceSession";
+    readonly PasswordResetCode: "PasswordResetCode";
 };
 export type ModelName = (typeof ModelName)[keyof typeof ModelName];
 export declare const TransactionIsolationLevel: {
@@ -56,6 +57,10 @@ export declare const UserScalarFieldEnum: {
     readonly passwordHash: "passwordHash";
     readonly status: "status";
     readonly isPlatformAdmin: "isPlatformAdmin";
+    readonly tokenVersion: "tokenVersion";
+    readonly mustChangePassword: "mustChangePassword";
+    readonly failedLoginCount: "failedLoginCount";
+    readonly lockedUntil: "lockedUntil";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
 };
@@ -239,6 +244,16 @@ export declare const AttendanceSessionScalarFieldEnum: {
     readonly updatedAt: "updatedAt";
 };
 export type AttendanceSessionScalarFieldEnum = (typeof AttendanceSessionScalarFieldEnum)[keyof typeof AttendanceSessionScalarFieldEnum];
+export declare const PasswordResetCodeScalarFieldEnum: {
+    readonly id: "id";
+    readonly userId: "userId";
+    readonly codeHash: "codeHash";
+    readonly attempts: "attempts";
+    readonly expiresAt: "expiresAt";
+    readonly usedAt: "usedAt";
+    readonly createdAt: "createdAt";
+};
+export type PasswordResetCodeScalarFieldEnum = (typeof PasswordResetCodeScalarFieldEnum)[keyof typeof PasswordResetCodeScalarFieldEnum];
 export declare const SortOrder: {
     readonly asc: "asc";
     readonly desc: "desc";
@@ -405,3 +420,9 @@ export declare const AttendanceSessionOrderByRelevanceFieldEnum: {
     readonly remarks: "remarks";
 };
 export type AttendanceSessionOrderByRelevanceFieldEnum = (typeof AttendanceSessionOrderByRelevanceFieldEnum)[keyof typeof AttendanceSessionOrderByRelevanceFieldEnum];
+export declare const PasswordResetCodeOrderByRelevanceFieldEnum: {
+    readonly id: "id";
+    readonly userId: "userId";
+    readonly codeHash: "codeHash";
+};
+export type PasswordResetCodeOrderByRelevanceFieldEnum = (typeof PasswordResetCodeOrderByRelevanceFieldEnum)[keyof typeof PasswordResetCodeOrderByRelevanceFieldEnum];

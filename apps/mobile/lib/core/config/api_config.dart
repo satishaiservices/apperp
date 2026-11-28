@@ -41,13 +41,12 @@ class ApiConfig {
   static String get allSubmissions => '$baseUrl/submissions';
   static String submissionDetail(String id) => '$baseUrl/submissions/$id';
   static String submissionPhotos(String id) => '$baseUrl/submissions/$id/photos';
-  static String submissionPhotoFile(String id, String photoId, [String? token]) {
-    final base = '$baseUrl/submissions/$id/photos/$photoId';
-    if (token != null && token.isNotEmpty) {
-      return '$base?token=$token';
-    }
-    return base;
-  }
+  /// Photo URL. The token is sent in the Authorization header by
+  /// [AuthenticatedImage] (via ApiClient), never in the URL, where it would be
+  /// written to proxy access logs. The [token] parameter is kept for call-site
+  /// compatibility and ignored.
+  static String submissionPhotoFile(String id, String photoId, [String? token]) =>
+      '$baseUrl/submissions/$id/photos/$photoId';
 
   static String get attendanceCheckIn => '$baseUrl/attendance/check-in';
   static String get attendanceCheckOut => '$baseUrl/attendance/check-out';

@@ -12,9 +12,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PlatformService = void 0;
 const common_1 = require("@nestjs/common");
 const argon2_1 = require("@node-rs/argon2");
+const temporary_password_util_1 = require("../common/utils/temporary-password.util");
 const crypto_1 = require("crypto");
 const prisma_service_1 = require("../database/prisma.service");
 const audit_service_1 = require("../audit/audit.service");
+const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
 let PlatformService = class PlatformService {
     prisma;
     audit;
@@ -324,12 +326,22 @@ let PlatformService = class PlatformService {
         });
         if (!membership)
             throw new common_1.NotFoundException('User is not a member of this organization');
-        const pass = newPassword?.trim() || `Pass${Math.random().toString(36).substring(2, 8)}!`;
+        const pass = newPassword?.trim() || (0, temporary_password_util_1.generateTemporaryPassword)();
+        if (pass.length < 10) {
+            throw new common_1.BadRequestException('Password must be at least 10 characters');
+        }
         const passwordHash = await (0, argon2_1.hash)(pass);
         await this.prisma.user.update({
             where: { id: userId },
-            data: { passwordHash },
+            data: {
+                passwordHash,
+                mustChangePassword: true,
+                tokenVersion: { increment: 1 },
+                failedLoginCount: 0,
+                lockedUntil: null,
+            },
         });
+        jwt_auth_guard_1.JwtAuthGuard.invalidateUser(userId);
         return {
             message: 'Password reset successfully',
             temporaryPassword: pass,
@@ -552,10 +564,13 @@ let PlatformService = class PlatformService {
             data.status = input.status;
         }
         if (input.newPassword?.trim()) {
-            if (input.newPassword.trim().length < 8) {
-                throw new common_1.BadRequestException('Password must be at least 8 characters long');
+            if (input.newPassword.trim().length < 10) {
+                throw new common_1.BadRequestException('Password must be at least 10 characters long');
             }
             data.passwordHash = await (0, argon2_1.hash)(input.newPassword.trim());
+        }
+        if (data.passwordHash || (input.status && input.status !== user.status)) {
+            data.tokenVersion = { increment: 1 };
         }
         const updated = await this.prisma.user.update({
             where: { id },
@@ -571,6 +586,7 @@ let PlatformService = class PlatformService {
                 updatedAt: true,
             },
         });
+        jwt_auth_guard_1.JwtAuthGuard.invalidateUser(id);
         await this.audit.log(auth, 'SUPERADMIN_UPDATED', 'User', id, {
             updatedFields: Object.keys(data).filter((k) => k !== 'passwordHash'),
             passwordChanged: !!input.newPassword,

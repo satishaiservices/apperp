@@ -78,5 +78,8 @@ export interface PrismaClient<in LogOpts extends Prisma.LogLevel = never, in out
     get attendanceSession(): Prisma.AttendanceSessionDelegate<ExtArgs, {
         omit: OmitOpts;
     }>;
+    get passwordResetCode(): Prisma.PasswordResetCodeDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
 }
 export declare function getPrismaClientClass(): PrismaClientConstructor;

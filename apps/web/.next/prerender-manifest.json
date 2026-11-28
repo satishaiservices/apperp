@@ -110,6 +110,42 @@
         "x-next-revalidate-tag-token"
       ]
     },
+    "/change-password": {
+      "renderingMode": "PARTIALLY_STATIC",
+      "routeType": "page",
+      "response": "complete",
+      "compute": "static",
+      "htmlSize": 10785,
+      "experimentalPPR": true,
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        },
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(?:[\\w-]+-Google|Google-[\\w-]+|Chrome-Lighthouse|Slurp|DuckDuckBot|baiduspider|yandex|sogou|bitlybot|tumblr|vkShare|quora link preview|redditbot|ia_archiver|Bingbot|BingPreview|applebot|facebookexternalhit|facebookcatalog|Twitterbot|LinkedInBot|Slackbot|Discordbot|WhatsApp|SkypeUriPreview|Yeti|googleweblight).*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/change-password",
+      "dataRoute": "/change-password.rsc",
+      "prefetchDataRoute": "/change-password.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
     "/favicon.ico": {
       "initialHeaders": {
         "cache-control": "public, max-age=0, must-revalidate",
@@ -148,7 +184,7 @@
       "routeType": "page",
       "response": "complete",
       "compute": "static",
-      "htmlSize": 18502,
+      "htmlSize": 18464,
       "experimentalPPR": true,
       "experimentalBypassFor": [
         {
@@ -435,8 +471,8 @@
   "dynamicRoutes": {},
   "notFoundRoutes": [],
   "preview": {
-    "previewModeId": "248b75362a0dfdd12b899cda7cda56c9",
-    "previewModeSigningKey": "a1ff1340d51e6684a75eae0ad277d1d11ee56cbf6a0114324070ba044991f802",
-    "previewModeEncryptionKey": "f5bd3aea0fd075c8a667dbe1904adcd47d9d8393c7b10df890869a2590e4b3bc"
+    "previewModeId": "8fc1572acb5171f456342a9d35bf774c",
+    "previewModeSigningKey": "57b4d422e9fc5966540802b804502c6d3ec57ab0cb708ce94490ef2c40ca8527",
+    "previewModeEncryptionKey": "de77f66281f0fe8340fdfe3d47f660c4f922394178ae89c28c1085257b68f57b"
   }
 }

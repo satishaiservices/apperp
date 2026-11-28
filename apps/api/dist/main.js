@@ -1,44 +1,47 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@nestjs/core");
 const common_1 = require("@nestjs/common");
+const helmet_1 = __importDefault(require("helmet"));
+const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const app_module_1 = require("./app.module");
+const DEFAULT_PRODUCTION_ORIGINS = ['https://apperp.yecindia.com'];
+const DEV_ORIGIN = /^http:\/\/(localhost|127\.0\.0\.1|10\.0\.2\.2|192\.168\.\d+\.\d+)(:\d+)?$/;
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule, {
         instrument: app_module_1.ObserveInstrument,
     });
-    const rawCorsOrigins = process.env.CORS_ALLOWED_ORIGINS;
-    const defaultAllowedOrigins = [
-        'https://apperp.yecindia.com',
-        'http://apperp.yecindia.com',
-        'http://localhost:3000',
-        'http://127.0.0.1:3000',
-        'http://localhost:3001',
-        'http://127.0.0.1:3001',
-    ];
-    const allowedOrigins = rawCorsOrigins
-        ? rawCorsOrigins.split(',').map((o) => o.trim()).filter(Boolean)
-        : defaultAllowedOrigins;
+    const isProduction = process.env.NODE_ENV === 'production';
+    app.set('trust proxy', Number(process.env.TRUST_PROXY_HOPS ?? 1));
+    app.use((0, helmet_1.default)({
+        contentSecurityPolicy: { directives: { defaultSrc: ["'none'"], frameAncestors: ["'none'"] } },
+        crossOriginResourcePolicy: { policy: 'same-site' },
+    }));
+    app.use((0, cookie_parser_1.default)());
+    const configuredOrigins = (process.env.CORS_ALLOWED_ORIGINS ?? '')
+        .split(',')
+        .map((o) => o.trim())
+        .filter(Boolean);
+    const allowedOrigins = configuredOrigins.length
+        ? configuredOrigins
+        : isProduction
+            ? DEFAULT_PRODUCTION_ORIGINS
+            : [];
     app.enableCors({
         origin: (requestOrigin, callback) => {
             if (!requestOrigin) {
                 return callback(null, true);
             }
-            if (allowedOrigins.includes(requestOrigin) ||
-                requestOrigin === 'https://apperp.yecindia.com' ||
-                requestOrigin.endsWith('.yecindia.com') ||
-                requestOrigin.endsWith('.trycloudflare.com') ||
-                (process.env.NODE_ENV !== 'production' &&
-                    (requestOrigin.startsWith('http://localhost:') ||
-                        requestOrigin.startsWith('http://127.0.0.1:') ||
-                        requestOrigin.startsWith('http://10.0.2.2:') ||
-                        requestOrigin.startsWith('http://192.168.')))) {
+            if (allowedOrigins.includes(requestOrigin) || (!isProduction && DEV_ORIGIN.test(requestOrigin))) {
                 return callback(null, true);
             }
-            return callback(new Error(`Origin ${requestOrigin} not allowed by CORS`));
+            return callback(null, false);
         },
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-        allowedHeaders: 'Content-Type,Accept,Authorization,X-Requested-With',
+        allowedHeaders: 'Content-Type,Accept,Authorization,X-Requested-With,X-Session-Mode',
         credentials: true,
     });
     app.use((req, _res, next) => {

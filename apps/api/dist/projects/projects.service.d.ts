@@ -28,8 +28,8 @@ export declare class ProjectsService {
     }>;
     findAll(auth: AuthenticatedUser): Promise<({
         _count: {
-            activities: number;
             siteSubmissions: number;
+            activities: number;
         };
     } & {
         id: string;

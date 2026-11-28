@@ -31,8 +31,8 @@ export declare class ProjectsController {
         user: AuthenticatedUser;
     }): Promise<({
         _count: {
-            activities: number;
             siteSubmissions: number;
+            activities: number;
         };
     } & {
         id: string;

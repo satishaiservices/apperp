@@ -14,7 +14,7 @@ export function middleware(request: NextRequest) {
   }
 
   // Protect organizational and platform routes
-  if (pathname.startsWith('/org') || pathname.startsWith('/platform')) {
+  if (pathname.startsWith('/org') || pathname.startsWith('/platform') || pathname === '/change-password') {
     if (!token) {
       const loginUrl = new URL('/login', request.url);
       loginUrl.searchParams.set('redirect', pathname);
@@ -31,5 +31,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/', '/org/:path*', '/platform/:path*', '/login'],
+  matcher: ['/', '/org/:path*', '/platform/:path*', '/login', '/change-password'],
 };

@@ -683,13 +683,6 @@ export type ActivityUncheckedCreateNestedManyWithoutParentInput = {
     createMany?: Prisma.ActivityCreateManyParentInputEnvelope;
     connect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[];
 };
-export type IntFieldUpdateOperationsInput = {
-    set?: number;
-    increment?: number;
-    decrement?: number;
-    multiply?: number;
-    divide?: number;
-};
 export type ActivityUpdateOneWithoutSubactivitiesNestedInput = {
     create?: Prisma.XOR<Prisma.ActivityCreateWithoutSubactivitiesInput, Prisma.ActivityUncheckedCreateWithoutSubactivitiesInput>;
     connectOrCreate?: Prisma.ActivityCreateOrConnectWithoutSubactivitiesInput;

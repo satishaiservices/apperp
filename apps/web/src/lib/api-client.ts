@@ -19,9 +19,15 @@ export class ApiError extends Error {
   }
 }
 
-export function setAuthCookie(token: string) {
+/**
+ * `vyhir_token` is only a "signed in" marker read by middleware.ts for routing.
+ * It never contains a credential. The access token lives in memory/localStorage
+ * (15 min lifetime); the refresh token is an httpOnly cookie set by the API.
+ */
+export function setAuthCookie(_token?: string) {
   if (typeof document !== 'undefined') {
-    document.cookie = `vyhir_token=${encodeURIComponent(token)}; path=/; max-age=604800; SameSite=Lax`;
+    const secure = window.location.protocol === 'https:' ? '; Secure' : '';
+    document.cookie = `vyhir_token=1; path=/; max-age=604800; SameSite=Lax${secure}`;
   }
 }
 
@@ -29,6 +35,18 @@ export function clearAuthCookie() {
   if (typeof document !== 'undefined') {
     document.cookie = 'vyhir_token=; path=/; max-age=0; SameSite=Lax';
   }
+}
+
+/** Ask the API to put the refresh token in an httpOnly cookie instead of the body. */
+export const SESSION_MODE_HEADER = { 'X-Session-Mode': 'cookie' } as const;
+
+export function clearStoredSession() {
+  if (typeof window === 'undefined') return;
+  localStorage.removeItem('vyhir_token');
+  localStorage.removeItem('vyhir_refresh_token'); // legacy key from older releases
+  localStorage.removeItem('vyhir_user');
+  localStorage.removeItem('vyhir_tenant');
+  clearAuthCookie();
 }
 
 export async function apiRequest<T = any>(
@@ -39,6 +57,7 @@ export async function apiRequest<T = any>(
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
+    ...SESSION_MODE_HEADER,
     ...(options.headers as Record<string, string>),
   };
 
@@ -56,6 +75,7 @@ export async function apiRequest<T = any>(
   const response = await fetch(url, {
     ...options,
     headers,
+    credentials: 'include',
   });
 
   if (!response.ok) {
@@ -66,48 +86,41 @@ export async function apiRequest<T = any>(
       !endpoint.includes('/auth/login') &&
       !endpoint.includes('/auth/refresh')
     ) {
-      const refreshToken = localStorage.getItem('vyhir_refresh_token');
-      if (refreshToken) {
-        try {
-          const refreshRes = await fetch(`${apiBase}/auth/refresh`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ refreshToken }),
-          });
+      try {
+        // The refresh token travels only as an httpOnly cookie.
+        const refreshRes = await fetch(`${apiBase}/auth/refresh`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...SESSION_MODE_HEADER },
+          credentials: 'include',
+          body: '{}',
+        });
 
-          if (refreshRes.ok) {
-            const data = await refreshRes.json();
-            if (data.accessToken) {
-              localStorage.setItem('vyhir_token', data.accessToken);
-              setAuthCookie(data.accessToken);
-              if (data.refreshToken) {
-                localStorage.setItem('vyhir_refresh_token', data.refreshToken);
-              }
+        if (refreshRes.ok) {
+          const data = await refreshRes.json();
+          if (data.accessToken) {
+            localStorage.setItem('vyhir_token', data.accessToken);
+            setAuthCookie();
 
-              // Replay original request with renewed access token
-              headers['Authorization'] = `Bearer ${data.accessToken}`;
-              const retryResponse = await fetch(url, {
-                ...options,
-                headers,
-              });
+            // Replay original request with renewed access token
+            headers['Authorization'] = `Bearer ${data.accessToken}`;
+            const retryResponse = await fetch(url, {
+              ...options,
+              headers,
+              credentials: 'include',
+            });
 
-              if (retryResponse.ok) {
-                if (retryResponse.status === 204) return {} as T;
-                return retryResponse.json();
-              }
+            if (retryResponse.ok) {
+              if (retryResponse.status === 204) return {} as T;
+              return retryResponse.json();
             }
           }
-        } catch {
-          // Token refresh attempt failed
         }
+      } catch {
+        // Token refresh attempt failed
       }
 
       // If refresh failed or unavailable, clear stale session
-      localStorage.removeItem('vyhir_token');
-      localStorage.removeItem('vyhir_refresh_token');
-      localStorage.removeItem('vyhir_user');
-      localStorage.removeItem('vyhir_tenant');
-      clearAuthCookie();
+      clearStoredSession();
     }
 
     let errorDetail = 'An unexpected error occurred';

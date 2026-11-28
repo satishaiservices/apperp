@@ -10,6 +10,7 @@ SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 SET time_zone = '+00:00';
 
 -- Drop existing tables in reverse dependency order for clean re-imports
+DROP TABLE IF EXISTS password_reset_codes;
 DROP TABLE IF EXISTS `attendance_sessions`;
 DROP TABLE IF EXISTS site_submission_photos;
 DROP TABLE IF EXISTS site_submission_activities;
@@ -52,6 +53,10 @@ CREATE TABLE `users` (
     `password_hash` TEXT NOT NULL,
     `status` VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
     `is_platform_admin` BOOLEAN NOT NULL DEFAULT false,
+    `token_version` INTEGER NOT NULL DEFAULT 0,
+    `must_change_password` BOOLEAN NOT NULL DEFAULT false,
+    `failed_login_count` INTEGER NOT NULL DEFAULT 0,
+    `locked_until` DATETIME(6) NULL,
     `created_at` DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     `updated_at` DATETIME(6) NOT NULL,
 
@@ -313,6 +318,21 @@ CREATE TABLE `attendance_sessions` (
     INDEX `attendance_sessions_tenant_id_project_id_check_in_at_idx`(`tenant_id`, `project_id`, `check_in_at` DESC),
     UNIQUE INDEX `attendance_sessions_tenant_id_id_key`(`tenant_id`, `id`),
     PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `password_reset_codes` (
+    `id` VARCHAR(36) NOT NULL,
+    `user_id` VARCHAR(36) NOT NULL,
+    `code_hash` TEXT NOT NULL,
+    `attempts` INTEGER NOT NULL DEFAULT 0,
+    `expires_at` DATETIME(6) NOT NULL,
+    `used_at` DATETIME(6) NULL,
+    `created_at` DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+
+    INDEX `password_reset_codes_user_id_created_at_idx`(`user_id`, `created_at`),
+    PRIMARY KEY (`id`),
+    CONSTRAINT `password_reset_codes_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey

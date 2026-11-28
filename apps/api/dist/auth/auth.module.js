@@ -11,7 +11,9 @@ const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
 const auth_controller_1 = require("./auth.controller");
 const auth_service_1 = require("./auth.service");
+const mail_service_1 = require("../common/services/mail.service");
 const jwt_auth_guard_1 = require("./jwt-auth.guard");
+const auth_tokens_1 = require("./auth-tokens");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -19,20 +21,14 @@ exports.AuthModule = AuthModule = __decorate([
     (0, common_1.Module)({
         imports: [
             jwt_1.JwtModule.registerAsync({
-                useFactory: () => {
-                    const secret = process.env.JWT_SECRET;
-                    if (!secret) {
-                        throw new Error('JWT_SECRET is missing');
-                    }
-                    return {
-                        secret,
-                        signOptions: { expiresIn: '15m' },
-                    };
-                },
+                useFactory: () => ({
+                    secret: (0, auth_tokens_1.getAccessSecret)(),
+                    signOptions: { expiresIn: auth_tokens_1.ACCESS_TOKEN_TTL_SECONDS },
+                }),
             }),
         ],
         controllers: [auth_controller_1.AuthController],
-        providers: [auth_service_1.AuthService, jwt_auth_guard_1.JwtAuthGuard],
+        providers: [auth_service_1.AuthService, jwt_auth_guard_1.JwtAuthGuard, mail_service_1.MailService],
         exports: [jwt_1.JwtModule, jwt_auth_guard_1.JwtAuthGuard],
     })
 ], AuthModule);

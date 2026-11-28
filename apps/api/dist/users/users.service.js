@@ -12,8 +12,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersService = void 0;
 const common_1 = require("@nestjs/common");
 const argon2_1 = require("@node-rs/argon2");
+const temporary_password_util_1 = require("../common/utils/temporary-password.util");
 const prisma_service_1 = require("../database/prisma.service");
 const audit_service_1 = require("../audit/audit.service");
+const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
 let UsersService = class UsersService {
     prisma;
     audit;
@@ -221,6 +223,16 @@ let UsersService = class UsersService {
         return result;
     }
     async setMembershipStatus(auth, membershipId, status) {
+        const result = await this.setMembershipStatusTx(auth, membershipId, status);
+        const member = await this.prisma.tenantMembership.findFirst({
+            where: { id: membershipId, tenantId: auth.tenantId },
+            select: { userId: true },
+        });
+        if (member)
+            jwt_auth_guard_1.JwtAuthGuard.invalidateUser(member.userId);
+        return result;
+    }
+    async setMembershipStatusTx(auth, membershipId, status) {
         const result = await this.prisma.$transaction(async (tx) => {
             const membership = await tx.tenantMembership.findFirst({
                 where: {
@@ -382,15 +394,22 @@ let UsersService = class UsersService {
         });
         if (!member)
             throw new common_1.NotFoundException('Employee not found');
-        const passwordToSet = newPassword?.trim() || 'VyhirReset@2026';
-        if (passwordToSet.length < 8) {
-            throw new common_1.BadRequestException('Password must be at least 8 characters');
+        const passwordToSet = newPassword?.trim() || (0, temporary_password_util_1.generateTemporaryPassword)();
+        if (passwordToSet.length < 10) {
+            throw new common_1.BadRequestException('Password must be at least 10 characters');
         }
         const passwordHash = await (0, argon2_1.hash)(passwordToSet);
         await this.prisma.user.update({
             where: { id: member.userId },
-            data: { passwordHash },
+            data: {
+                passwordHash,
+                mustChangePassword: true,
+                tokenVersion: { increment: 1 },
+                failedLoginCount: 0,
+                lockedUntil: null,
+            },
         });
+        jwt_auth_guard_1.JwtAuthGuard.invalidateUser(member.userId);
         await this.audit.log(auth, 'USER_PASSWORD_RESET', 'User', member.userId, {
             membershipId,
             username: member.user.username,

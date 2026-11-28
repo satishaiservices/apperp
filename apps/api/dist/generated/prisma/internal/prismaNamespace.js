@@ -33,8 +33,8 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ActivityOrderByRelevanceFieldEnum = exports.ProjectOrderByRelevanceFieldEnum = exports.AuditLogOrderByRelevanceFieldEnum = exports.QueryMode = exports.JsonNullValueFilter = exports.MembershipRoleOrderByRelevanceFieldEnum = exports.RolePermissionOrderByRelevanceFieldEnum = exports.RoleOrderByRelevanceFieldEnum = exports.PermissionOrderByRelevanceFieldEnum = exports.TenantMembershipOrderByRelevanceFieldEnum = exports.UserOrderByRelevanceFieldEnum = exports.NullsOrder = exports.TenantOrderByRelevanceFieldEnum = exports.JsonNullValueInput = exports.SortOrder = exports.AttendanceSessionScalarFieldEnum = exports.SiteSubmissionPhotoScalarFieldEnum = exports.SiteSubmissionActivityScalarFieldEnum = exports.SiteSubmissionScalarFieldEnum = exports.DailyProgressReportScalarFieldEnum = exports.ActivityAssignmentScalarFieldEnum = exports.ActivityScalarFieldEnum = exports.ProjectScalarFieldEnum = exports.AuditLogScalarFieldEnum = exports.MembershipRoleScalarFieldEnum = exports.RolePermissionScalarFieldEnum = exports.RoleScalarFieldEnum = exports.PermissionScalarFieldEnum = exports.TenantMembershipScalarFieldEnum = exports.UserScalarFieldEnum = exports.TenantScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.prismaVersion = exports.getExtensionContext = exports.Decimal = exports.Sql = exports.raw = exports.join = exports.empty = exports.sql = exports.PrismaClientValidationError = exports.PrismaClientInitializationError = exports.PrismaClientRustPanicError = exports.PrismaClientUnknownRequestError = exports.PrismaClientKnownRequestError = void 0;
-exports.defineExtension = exports.AttendanceSessionOrderByRelevanceFieldEnum = exports.SiteSubmissionPhotoOrderByRelevanceFieldEnum = exports.SiteSubmissionActivityOrderByRelevanceFieldEnum = exports.SiteSubmissionOrderByRelevanceFieldEnum = exports.DailyProgressReportOrderByRelevanceFieldEnum = exports.ActivityAssignmentOrderByRelevanceFieldEnum = void 0;
+exports.ProjectOrderByRelevanceFieldEnum = exports.AuditLogOrderByRelevanceFieldEnum = exports.QueryMode = exports.JsonNullValueFilter = exports.MembershipRoleOrderByRelevanceFieldEnum = exports.RolePermissionOrderByRelevanceFieldEnum = exports.RoleOrderByRelevanceFieldEnum = exports.PermissionOrderByRelevanceFieldEnum = exports.TenantMembershipOrderByRelevanceFieldEnum = exports.UserOrderByRelevanceFieldEnum = exports.NullsOrder = exports.TenantOrderByRelevanceFieldEnum = exports.JsonNullValueInput = exports.SortOrder = exports.PasswordResetCodeScalarFieldEnum = exports.AttendanceSessionScalarFieldEnum = exports.SiteSubmissionPhotoScalarFieldEnum = exports.SiteSubmissionActivityScalarFieldEnum = exports.SiteSubmissionScalarFieldEnum = exports.DailyProgressReportScalarFieldEnum = exports.ActivityAssignmentScalarFieldEnum = exports.ActivityScalarFieldEnum = exports.ProjectScalarFieldEnum = exports.AuditLogScalarFieldEnum = exports.MembershipRoleScalarFieldEnum = exports.RolePermissionScalarFieldEnum = exports.RoleScalarFieldEnum = exports.PermissionScalarFieldEnum = exports.TenantMembershipScalarFieldEnum = exports.UserScalarFieldEnum = exports.TenantScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.prismaVersion = exports.getExtensionContext = exports.Decimal = exports.Sql = exports.raw = exports.join = exports.empty = exports.sql = exports.PrismaClientValidationError = exports.PrismaClientInitializationError = exports.PrismaClientRustPanicError = exports.PrismaClientUnknownRequestError = exports.PrismaClientKnownRequestError = void 0;
+exports.defineExtension = exports.PasswordResetCodeOrderByRelevanceFieldEnum = exports.AttendanceSessionOrderByRelevanceFieldEnum = exports.SiteSubmissionPhotoOrderByRelevanceFieldEnum = exports.SiteSubmissionActivityOrderByRelevanceFieldEnum = exports.SiteSubmissionOrderByRelevanceFieldEnum = exports.DailyProgressReportOrderByRelevanceFieldEnum = exports.ActivityAssignmentOrderByRelevanceFieldEnum = exports.ActivityOrderByRelevanceFieldEnum = void 0;
 const runtime = __importStar(require("@prisma/client/runtime/client"));
 exports.PrismaClientKnownRequestError = runtime.PrismaClientKnownRequestError;
 exports.PrismaClientUnknownRequestError = runtime.PrismaClientUnknownRequestError;
@@ -76,7 +76,8 @@ exports.ModelName = {
     SiteSubmission: 'SiteSubmission',
     SiteSubmissionActivity: 'SiteSubmissionActivity',
     SiteSubmissionPhoto: 'SiteSubmissionPhoto',
-    AttendanceSession: 'AttendanceSession'
+    AttendanceSession: 'AttendanceSession',
+    PasswordResetCode: 'PasswordResetCode'
 };
 exports.TransactionIsolationLevel = runtime.makeStrictEnum({
     ReadUncommitted: 'ReadUncommitted',
@@ -103,6 +104,10 @@ exports.UserScalarFieldEnum = {
     passwordHash: 'passwordHash',
     status: 'status',
     isPlatformAdmin: 'isPlatformAdmin',
+    tokenVersion: 'tokenVersion',
+    mustChangePassword: 'mustChangePassword',
+    failedLoginCount: 'failedLoginCount',
+    lockedUntil: 'lockedUntil',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
 };
@@ -271,6 +276,15 @@ exports.AttendanceSessionScalarFieldEnum = {
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
 };
+exports.PasswordResetCodeScalarFieldEnum = {
+    id: 'id',
+    userId: 'userId',
+    codeHash: 'codeHash',
+    attempts: 'attempts',
+    expiresAt: 'expiresAt',
+    usedAt: 'usedAt',
+    createdAt: 'createdAt'
+};
 exports.SortOrder = {
     asc: 'asc',
     desc: 'desc'
@@ -415,6 +429,11 @@ exports.AttendanceSessionOrderByRelevanceFieldEnum = {
     projectId: 'projectId',
     status: 'status',
     remarks: 'remarks'
+};
+exports.PasswordResetCodeOrderByRelevanceFieldEnum = {
+    id: 'id',
+    userId: 'userId',
+    codeHash: 'codeHash'
 };
 exports.defineExtension = runtime.Extensions.defineExtension;
 //# sourceMappingURL=prismaNamespace.js.map

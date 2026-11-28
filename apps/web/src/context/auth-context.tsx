@@ -1,8 +1,8 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { apiRequest, setAuthCookie, clearAuthCookie } from '@/lib/api-client';
+import { useRouter, usePathname } from 'next/navigation';
+import { apiRequest, setAuthCookie, clearStoredSession } from '@/lib/api-client';
 
 export interface UserProfile {
   id: string;
@@ -11,6 +11,7 @@ export interface UserProfile {
   username: string | null;
   phone: string | null;
   isPlatformAdmin: boolean;
+  mustChangePassword?: boolean;
 }
 
 export interface TenantInfo {
@@ -27,6 +28,8 @@ interface AuthContextType {
   isLoading: boolean;
   login: (identifier: string, password: string, requestedMode?: 'org' | 'platform') => Promise<void>;
   logout: () => void;
+  /** Store a session returned by /auth/change-password (new tokens, flag cleared). */
+  applySession: (data: any) => UserProfile;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -37,6 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     // Restore session on mount
@@ -45,9 +49,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const storedUser = localStorage.getItem('vyhir_user');
       const storedTenant = localStorage.getItem('vyhir_tenant');
 
+      // Refresh tokens are no longer kept in localStorage (httpOnly cookie instead).
+      localStorage.removeItem('vyhir_refresh_token');
+
       if (storedToken && storedUser) {
         setToken(storedToken);
-        setAuthCookie(storedToken);
+        setAuthCookie();
         setUser(JSON.parse(storedUser));
         if (storedTenant) {
           setTenant(JSON.parse(storedTenant));
@@ -66,6 +73,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       body: JSON.stringify({ identifier, password }),
     });
 
+    const authUser = applySession(data);
+
+    if (authUser.mustChangePassword) {
+      router.push('/change-password');
+    } else if (authUser.isPlatformAdmin && requestedMode === 'platform') {
+      router.push('/platform');
+    } else {
+      router.push('/org/dashboard');
+    }
+  };
+
+  const applySession = (data: any): UserProfile => {
     const authToken = data.accessToken;
     const authUser: UserProfile = {
       id: data.user.id,
@@ -74,6 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       username: data.user.username,
       phone: data.user.phone,
       isPlatformAdmin: !!data.user.isPlatformAdmin,
+      mustChangePassword: !!data.user.mustChangePassword,
     };
 
     const authTenant: TenantInfo | null = data.tenant ? {
@@ -83,10 +103,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } : null;
 
     localStorage.setItem('vyhir_token', authToken);
-    if (data.refreshToken) {
-      localStorage.setItem('vyhir_refresh_token', data.refreshToken);
-    }
-    setAuthCookie(authToken);
+    setAuthCookie();
     localStorage.setItem('vyhir_user', JSON.stringify(authUser));
     if (authTenant) {
       localStorage.setItem('vyhir_tenant', JSON.stringify(authTenant));
@@ -95,20 +112,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setToken(authToken);
     setUser(authUser);
     setTenant(authTenant);
-
-    if (authUser.isPlatformAdmin && requestedMode === 'platform') {
-      router.push('/platform');
-    } else {
-      router.push('/org/dashboard');
-    }
+    return authUser;
   };
 
+  // Accounts with an admin-set or default password must change it before anything else.
+  useEffect(() => {
+    if (!isLoading && user?.mustChangePassword && pathname !== '/change-password') {
+      router.replace('/change-password');
+    }
+  }, [isLoading, user, pathname, router]);
+
   const logout = () => {
-    localStorage.removeItem('vyhir_token');
-    localStorage.removeItem('vyhir_refresh_token');
-    localStorage.removeItem('vyhir_user');
-    localStorage.removeItem('vyhir_tenant');
-    clearAuthCookie();
+    // Clears the httpOnly refresh cookie server-side; ignore network errors.
+    apiRequest('/auth/logout', { method: 'POST' }).catch(() => {});
+    clearStoredSession();
     setToken(null);
     setUser(null);
     setTenant(null);
@@ -125,6 +142,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isLoading,
         login,
         logout,
+        applySession,
       }}
     >
       {children}

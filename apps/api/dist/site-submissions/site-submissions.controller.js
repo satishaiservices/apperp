@@ -28,7 +28,7 @@ const node_fs_2 = require("node:fs");
 const file_signature_util_1 = require("../common/utils/file-signature.util");
 const image_processor_service_1 = require("../common/services/image-processor.service");
 const submission_dto_1 = require("./dto/submission.dto");
-const uploadDir = (0, node_path_1.resolve)(process.cwd(), 'storage/site-submissions');
+const uploadDir = (0, node_path_1.resolve)(process.env.STORAGE_DIR ? (0, node_path_1.resolve)(process.env.STORAGE_DIR) : (0, node_path_1.resolve)(process.cwd(), 'storage'), 'site-submissions');
 (0, node_fs_1.mkdirSync)(uploadDir, { recursive: true });
 const allowedTypes = {
     'image/jpeg': '.jpg',

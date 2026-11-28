@@ -176,6 +176,7 @@ export declare const ModelName: {
     readonly SiteSubmissionActivity: "SiteSubmissionActivity";
     readonly SiteSubmissionPhoto: "SiteSubmissionPhoto";
     readonly AttendanceSession: "AttendanceSession";
+    readonly PasswordResetCode: "PasswordResetCode";
 };
 export type ModelName = (typeof ModelName)[keyof typeof ModelName];
 export interface TypeMapCb<GlobalOmitOptions = {}> extends runtime.Types.Utils.Fn<{
@@ -188,7 +189,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         omit: GlobalOmitOptions;
     };
     meta: {
-        modelProps: "tenant" | "user" | "tenantMembership" | "permission" | "role" | "rolePermission" | "membershipRole" | "auditLog" | "project" | "activity" | "activityAssignment" | "dailyProgressReport" | "siteSubmission" | "siteSubmissionActivity" | "siteSubmissionPhoto" | "attendanceSession";
+        modelProps: "tenant" | "user" | "tenantMembership" | "permission" | "role" | "rolePermission" | "membershipRole" | "auditLog" | "project" | "activity" | "activityAssignment" | "dailyProgressReport" | "siteSubmission" | "siteSubmissionActivity" | "siteSubmissionPhoto" | "attendanceSession" | "passwordResetCode";
         txIsolationLevel: TransactionIsolationLevel;
     };
     model: {
@@ -1248,6 +1249,72 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
                 };
             };
         };
+        PasswordResetCode: {
+            payload: Prisma.$PasswordResetCodePayload<ExtArgs>;
+            fields: Prisma.PasswordResetCodeFieldRefs;
+            operations: {
+                findUnique: {
+                    args: Prisma.PasswordResetCodeFindUniqueArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetCodePayload> | null;
+                };
+                findUniqueOrThrow: {
+                    args: Prisma.PasswordResetCodeFindUniqueOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetCodePayload>;
+                };
+                findFirst: {
+                    args: Prisma.PasswordResetCodeFindFirstArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetCodePayload> | null;
+                };
+                findFirstOrThrow: {
+                    args: Prisma.PasswordResetCodeFindFirstOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetCodePayload>;
+                };
+                findMany: {
+                    args: Prisma.PasswordResetCodeFindManyArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetCodePayload>[];
+                };
+                create: {
+                    args: Prisma.PasswordResetCodeCreateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetCodePayload>;
+                };
+                createMany: {
+                    args: Prisma.PasswordResetCodeCreateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                delete: {
+                    args: Prisma.PasswordResetCodeDeleteArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetCodePayload>;
+                };
+                update: {
+                    args: Prisma.PasswordResetCodeUpdateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetCodePayload>;
+                };
+                deleteMany: {
+                    args: Prisma.PasswordResetCodeDeleteManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateMany: {
+                    args: Prisma.PasswordResetCodeUpdateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                upsert: {
+                    args: Prisma.PasswordResetCodeUpsertArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PasswordResetCodePayload>;
+                };
+                aggregate: {
+                    args: Prisma.PasswordResetCodeAggregateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AggregatePasswordResetCode>;
+                };
+                groupBy: {
+                    args: Prisma.PasswordResetCodeGroupByArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.PasswordResetCodeGroupByOutputType>[];
+                };
+                count: {
+                    args: Prisma.PasswordResetCodeCountArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.PasswordResetCodeCountAggregateOutputType> | number;
+                };
+            };
+        };
     };
 } & {
     other: {
@@ -1299,6 +1366,10 @@ export declare const UserScalarFieldEnum: {
     readonly passwordHash: "passwordHash";
     readonly status: "status";
     readonly isPlatformAdmin: "isPlatformAdmin";
+    readonly tokenVersion: "tokenVersion";
+    readonly mustChangePassword: "mustChangePassword";
+    readonly failedLoginCount: "failedLoginCount";
+    readonly lockedUntil: "lockedUntil";
     readonly createdAt: "createdAt";
     readonly updatedAt: "updatedAt";
 };
@@ -1482,6 +1553,16 @@ export declare const AttendanceSessionScalarFieldEnum: {
     readonly updatedAt: "updatedAt";
 };
 export type AttendanceSessionScalarFieldEnum = (typeof AttendanceSessionScalarFieldEnum)[keyof typeof AttendanceSessionScalarFieldEnum];
+export declare const PasswordResetCodeScalarFieldEnum: {
+    readonly id: "id";
+    readonly userId: "userId";
+    readonly codeHash: "codeHash";
+    readonly attempts: "attempts";
+    readonly expiresAt: "expiresAt";
+    readonly usedAt: "usedAt";
+    readonly createdAt: "createdAt";
+};
+export type PasswordResetCodeScalarFieldEnum = (typeof PasswordResetCodeScalarFieldEnum)[keyof typeof PasswordResetCodeScalarFieldEnum];
 export declare const SortOrder: {
     readonly asc: "asc";
     readonly desc: "desc";
@@ -1648,13 +1729,19 @@ export declare const AttendanceSessionOrderByRelevanceFieldEnum: {
     readonly remarks: "remarks";
 };
 export type AttendanceSessionOrderByRelevanceFieldEnum = (typeof AttendanceSessionOrderByRelevanceFieldEnum)[keyof typeof AttendanceSessionOrderByRelevanceFieldEnum];
+export declare const PasswordResetCodeOrderByRelevanceFieldEnum: {
+    readonly id: "id";
+    readonly userId: "userId";
+    readonly codeHash: "codeHash";
+};
+export type PasswordResetCodeOrderByRelevanceFieldEnum = (typeof PasswordResetCodeOrderByRelevanceFieldEnum)[keyof typeof PasswordResetCodeOrderByRelevanceFieldEnum];
 export type StringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String'>;
 export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>;
 export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>;
+export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>;
 export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>;
 export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>;
 export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>;
-export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>;
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>;
 export type BatchPayload = {
     count: number;
@@ -1700,6 +1787,7 @@ export type GlobalOmitConfig = {
     siteSubmissionActivity?: Prisma.SiteSubmissionActivityOmit;
     siteSubmissionPhoto?: Prisma.SiteSubmissionPhotoOmit;
     attendanceSession?: Prisma.AttendanceSessionOmit;
+    passwordResetCode?: Prisma.PasswordResetCodeOmit;
 };
 export type LogLevel = 'info' | 'query' | 'warn' | 'error';
 export type LogDefinition = {

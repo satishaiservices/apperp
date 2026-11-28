@@ -114,6 +114,7 @@ export declare class UsersService {
         status: "ACTIVE" | "INACTIVE";
         message?: undefined;
     }>;
+    private setMembershipStatusTx;
     provisionEmployee(auth: AuthenticatedUser, input: {
         fullName: string;
         username: string;

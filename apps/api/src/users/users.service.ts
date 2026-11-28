@@ -6,9 +6,11 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { hash } from '@node-rs/argon2';
+import { generateTemporaryPassword } from '../common/utils/temporary-password.util';
 
 import { PrismaService } from '../database/prisma.service';
 import { AuditService } from '../audit/audit.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import type { AuthenticatedUser } from '../auth/jwt-auth.guard';
 
 @Injectable()
@@ -257,6 +259,20 @@ export class UsersService {
     membershipId: string,
     status: 'ACTIVE' | 'INACTIVE',
   ) {
+    const result = await this.setMembershipStatusTx(auth, membershipId, status);
+    const member = await this.prisma.tenantMembership.findFirst({
+      where: { id: membershipId, tenantId: auth.tenantId },
+      select: { userId: true },
+    });
+    if (member) JwtAuthGuard.invalidateUser(member.userId);
+    return result;
+  }
+
+  private async setMembershipStatusTx(
+    auth: AuthenticatedUser,
+    membershipId: string,
+    status: 'ACTIVE' | 'INACTIVE',
+  ) {
     const result = await this.prisma.$transaction(async (tx) => {
       const membership = await tx.tenantMembership.findFirst({
         where: {
@@ -463,17 +479,26 @@ export class UsersService {
 
     if (!member) throw new NotFoundException('Employee not found');
 
-    const passwordToSet = newPassword?.trim() || 'VyhirReset@2026';
-    if (passwordToSet.length < 8) {
-      throw new BadRequestException('Password must be at least 8 characters');
+    const passwordToSet = newPassword?.trim() || generateTemporaryPassword();
+    if (passwordToSet.length < 10) {
+      throw new BadRequestException('Password must be at least 10 characters');
     }
 
     const passwordHash = await hash(passwordToSet);
 
+    // Admin-set passwords are temporary: the user must choose a new one at next
+    // login, and all of the user's existing sessions are revoked.
     await this.prisma.user.update({
       where: { id: member.userId },
-      data: { passwordHash },
+      data: {
+        passwordHash,
+        mustChangePassword: true,
+        tokenVersion: { increment: 1 },
+        failedLoginCount: 0,
+        lockedUntil: null,
+      },
     });
+    JwtAuthGuard.invalidateUser(member.userId);
 
     await this.audit.log(auth, 'USER_PASSWORD_RESET', 'User', member.userId, {
       membershipId,

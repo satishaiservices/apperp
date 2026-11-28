@@ -1,5 +1,6 @@
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../database/prisma.service';
+import { MailService } from '../common/services/mail.service';
 export interface RegisterInput {
     fullName: string;
     email: string;
@@ -21,15 +22,15 @@ export interface ResetPasswordInput {
     token: string;
     newPassword: string;
 }
+export declare const MIN_PASSWORD_LENGTH = 10;
 export declare class AuthService {
     private readonly prisma;
     private readonly jwt;
+    private readonly mail;
     private readonly logger;
-    private readonly passwordResetTokens;
-    constructor(prisma: PrismaService, jwt: JwtService);
+    constructor(prisma: PrismaService, jwt: JwtService, mail: MailService);
+    isRegistrationEnabled(): boolean;
     register(input: RegisterInput): Promise<{
-        accessToken: string;
-        refreshToken: string;
         tokenType: string;
         expiresIn: number;
         user: {
@@ -41,6 +42,7 @@ export declare class AuthService {
             emergencyPhone: string | null;
             avatarUrl: string | null;
             isPlatformAdmin: boolean;
+            mustChangePassword: boolean;
         };
         tenant: {
             id: string;
@@ -48,34 +50,15 @@ export declare class AuthService {
             slug: string;
         };
         roles: string[];
-    }>;
-    login(input: LoginInput): Promise<{
         accessToken: string;
         refreshToken: string;
-        tokenType: string;
-        expiresIn: number;
-        user: {
-            id: string;
-            fullName: string;
-            email: string | null;
-            username: string | null;
-            isPlatformAdmin: boolean;
-        };
-        tenant: {
-            id: string;
-            name: string;
-            slug: string;
-        };
-        roles: string[];
-        availableTenants: never[];
-    } | {
+    }>;
+    login(input: LoginInput): Promise<{
         availableTenants: {
             id: string;
             name: string;
             slug: string;
         }[];
-        accessToken: string;
-        refreshToken: string;
         tokenType: string;
         expiresIn: number;
         user: {
@@ -87,6 +70,7 @@ export declare class AuthService {
             emergencyPhone: string | null;
             avatarUrl: string | null;
             isPlatformAdmin: boolean;
+            mustChangePassword: boolean;
         };
         tenant: {
             id: string;
@@ -94,6 +78,8 @@ export declare class AuthService {
             slug: string;
         };
         roles: string[];
+        accessToken: string;
+        refreshToken: string;
     }>;
     forgotPassword(input: ForgotPasswordInput): Promise<{
         success: boolean;
@@ -103,6 +89,39 @@ export declare class AuthService {
         success: boolean;
         message: string;
     }>;
+    changePassword(auth: {
+        sub: string;
+        tenantId: string;
+        membershipId: string;
+        isPlatformAdmin?: boolean;
+    }, input: {
+        currentPassword: string;
+        newPassword: string;
+    }): Promise<{
+        tokenType: string;
+        expiresIn: number;
+        user: {
+            isPlatformAdmin: boolean;
+            id: string;
+            fullName: string;
+            email: string | null;
+            username: string | null;
+            phone: string | null;
+            emergencyPhone: string | null;
+            avatarUrl: string | null;
+            mustChangePassword: boolean;
+        };
+        tenant: {
+            id: string;
+            name: string;
+            slug: string;
+        };
+        roles: string[];
+        accessToken: string;
+        refreshToken: string;
+        message: string;
+    }>;
+    private assertPasswordStrength;
     getMe(auth: {
         sub: string;
         tenantId: string;
@@ -143,12 +162,13 @@ export declare class AuthService {
             avatarUrl: string | null;
         };
     }>;
+    private signTokens;
+    private publicUser;
+    private createPlatformSession;
     private createSession;
     refresh(input: {
-        refreshToken: string;
+        refreshToken?: string;
     }): Promise<{
-        accessToken: string;
-        refreshToken: string;
         tokenType: string;
         expiresIn: number;
         user: {
@@ -160,6 +180,7 @@ export declare class AuthService {
             emergencyPhone: string | null;
             avatarUrl: string | null;
             isPlatformAdmin: boolean;
+            mustChangePassword: boolean;
         };
         tenant: {
             id: string;
@@ -167,23 +188,7 @@ export declare class AuthService {
             slug: string;
         };
         roles: string[];
-    } | {
         accessToken: string;
         refreshToken: string;
-        tokenType: string;
-        expiresIn: number;
-        user: {
-            id: string;
-            fullName: string;
-            email: string | null;
-            username: string | null;
-            isPlatformAdmin: boolean;
-        };
-        tenant: {
-            id: string;
-            name: string;
-            slug: string;
-        };
-        roles: string[];
     }>;
 }

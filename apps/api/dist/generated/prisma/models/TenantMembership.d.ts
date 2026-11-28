@@ -409,9 +409,6 @@ export type TenantMembershipUncheckedUpdateManyWithoutUserNestedInput = {
     updateMany?: Prisma.TenantMembershipUpdateManyWithWhereWithoutUserInput | Prisma.TenantMembershipUpdateManyWithWhereWithoutUserInput[];
     deleteMany?: Prisma.TenantMembershipScalarWhereInput | Prisma.TenantMembershipScalarWhereInput[];
 };
-export type NullableDateTimeFieldUpdateOperationsInput = {
-    set?: Date | string | null;
-};
 export type TenantMembershipCreateNestedOneWithoutMembershipRolesInput = {
     create?: Prisma.XOR<Prisma.TenantMembershipCreateWithoutMembershipRolesInput, Prisma.TenantMembershipUncheckedCreateWithoutMembershipRolesInput>;
     connectOrCreate?: Prisma.TenantMembershipCreateOrConnectWithoutMembershipRolesInput;

@@ -2,6 +2,7 @@
   "/_not-found/page": "/_not-found",
   "/_global-error/page": "/_global-error",
   "/favicon.ico/route": "/favicon.ico",
+  "/change-password/page": "/change-password",
   "/login/page": "/login",
   "/page": "/",
   "/org/attendance/page": "/org/attendance",

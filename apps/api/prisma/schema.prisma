@@ -49,10 +49,17 @@ model User {
   status          String  @default("ACTIVE") @db.VarChar(20)
   isPlatformAdmin Boolean @default(false) @map("is_platform_admin")
 
+  // Security: bumped on password change / deactivation to revoke all issued tokens
+  tokenVersion       Int       @default(0) @map("token_version")
+  mustChangePassword Boolean   @default(false) @map("must_change_password")
+  failedLoginCount   Int       @default(0) @map("failed_login_count")
+  lockedUntil        DateTime? @map("locked_until") @db.DateTime(6)
+
   createdAt DateTime @default(now()) @map("created_at") @db.DateTime(6)
   updatedAt DateTime @updatedAt @map("updated_at") @db.DateTime(6)
 
-  memberships TenantMembership[]
+  memberships        TenantMembership[]
+  passwordResetCodes PasswordResetCode[]
 
   @@index([status])
   @@map("users")
@@ -447,3 +454,21 @@ model AttendanceSession {
   @@map("attendance_sessions")
 }
 
+// ==========================================
+// PASSWORD RESET CODES (hashed one-time codes)
+// ==========================================
+
+model PasswordResetCode {
+  id        String    @id @default(uuid()) @db.VarChar(36)
+  userId    String    @map("user_id") @db.VarChar(36)
+  codeHash  String    @map("code_hash") @db.Text
+  attempts  Int       @default(0)
+  expiresAt DateTime  @map("expires_at") @db.DateTime(6)
+  usedAt    DateTime? @map("used_at") @db.DateTime(6)
+  createdAt DateTime  @default(now()) @map("created_at") @db.DateTime(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("password_reset_codes")
+}
