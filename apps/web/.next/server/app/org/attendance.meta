@@ -1,0 +1,40 @@
+{
+  "status": 200,
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/org/layout,_N_T_/org/attendance/layout,_N_T_/org/attendance/page,_N_T_/org/attendance"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/org/attendance/__PAGE__"
+  ],
+  "prefetchHints": {
+    "hints": 49216,
+    "slots": {
+      "children": {
+        "hints": 49248,
+        "slots": {
+          "children": {
+            "hints": 49248,
+            "slots": {
+              "children": {
+                "hints": 49312,
+                "slots": null
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "routeCache": {
+    "key": "/route-cache/APP_PAGE/4b72ffee7f22c63361035a6eeb273ac235a6cffddd1f5b12d238327224d51f0f/$/org/attendance",
+    "owner": {
+      "kind": "APP_PAGE",
+      "sourceRoute": "/org/attendance/page"
+    },
+    "isFallback": false
+  }
+}

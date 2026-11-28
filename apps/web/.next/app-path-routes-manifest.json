@@ -1,0 +1,14 @@
+{
+  "/_not-found/page": "/_not-found",
+  "/_global-error/page": "/_global-error",
+  "/favicon.ico/route": "/favicon.ico",
+  "/login/page": "/login",
+  "/page": "/",
+  "/org/attendance/page": "/org/attendance",
+  "/org/audit/page": "/org/audit",
+  "/org/dashboard/page": "/org/dashboard",
+  "/org/employees/page": "/org/employees",
+  "/org/projects/page": "/org/projects",
+  "/org/submissions/page": "/org/submissions",
+  "/platform/page": "/platform"
+}

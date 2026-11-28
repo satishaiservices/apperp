@@ -1,0 +1,206 @@
+{
+  "version": 3,
+  "pages404": true,
+  "appType": "app",
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "priority": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/:path*",
+      "headers": [
+        {
+          "key": "X-DNS-Prefetch-Control",
+          "value": "on"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains; preload"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=(self)"
+        }
+      ],
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))?(?:/)?$"
+    }
+  ],
+  "onMatchHeaders": [],
+  "rewrites": {
+    "beforeFiles": [],
+    "afterFiles": [
+      {
+        "source": "/api-proxy/:path*",
+        "destination": "https://apperp.yecindia.com/api/:path*",
+        "regex": "^/api-proxy(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))?(?:/)?$"
+      },
+      {
+        "source": "/api/v1/:path*",
+        "destination": "https://apperp.yecindia.com/api/:path*",
+        "regex": "^/api/v1(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))?(?:/)?$"
+      },
+      {
+        "source": "/auth/:path*",
+        "destination": "https://apperp.yecindia.com/api/auth/:path*",
+        "regex": "^/auth(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))?(?:/)?$"
+      },
+      {
+        "source": "/projects/:path*",
+        "destination": "https://apperp.yecindia.com/api/projects/:path*",
+        "regex": "^/projects(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))?(?:/)?$"
+      },
+      {
+        "source": "/submissions/:path*",
+        "destination": "https://apperp.yecindia.com/api/submissions/:path*",
+        "regex": "^/submissions(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))?(?:/)?$"
+      },
+      {
+        "source": "/activities/:path*",
+        "destination": "https://apperp.yecindia.com/api/activities/:path*",
+        "regex": "^/activities(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))?(?:/)?$"
+      },
+      {
+        "source": "/attendance/:path*",
+        "destination": "https://apperp.yecindia.com/api/attendance/:path*",
+        "regex": "^/attendance(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))?(?:/)?$"
+      },
+      {
+        "source": "/users/:path*",
+        "destination": "https://apperp.yecindia.com/api/users/:path*",
+        "regex": "^/users(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))?(?:/)?$"
+      },
+      {
+        "source": "/dprs/:path*",
+        "destination": "https://apperp.yecindia.com/api/dprs/:path*",
+        "regex": "^/dprs(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))?(?:/)?$"
+      },
+      {
+        "source": "/audit/:path*",
+        "destination": "https://apperp.yecindia.com/api/audit/:path*",
+        "regex": "^/audit(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))?(?:/)?$"
+      }
+    ],
+    "fallback": []
+  },
+  "dynamicRoutes": [],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_global-error",
+      "regex": "^/_global\\-error(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_global\\-error(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/favicon.ico",
+      "regex": "^/favicon\\.ico(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/favicon\\.ico(?:/)?$"
+    },
+    {
+      "page": "/login",
+      "regex": "^/login(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/login(?:/)?$"
+    },
+    {
+      "page": "/org/attendance",
+      "regex": "^/org/attendance(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/org/attendance(?:/)?$"
+    },
+    {
+      "page": "/org/audit",
+      "regex": "^/org/audit(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/org/audit(?:/)?$"
+    },
+    {
+      "page": "/org/dashboard",
+      "regex": "^/org/dashboard(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/org/dashboard(?:/)?$"
+    },
+    {
+      "page": "/org/employees",
+      "regex": "^/org/employees(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/org/employees(?:/)?$"
+    },
+    {
+      "page": "/org/projects",
+      "regex": "^/org/projects(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/org/projects(?:/)?$"
+    },
+    {
+      "page": "/org/submissions",
+      "regex": "^/org/submissions(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/org/submissions(?:/)?$"
+    },
+    {
+      "page": "/platform",
+      "regex": "^/platform(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/platform(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "rsc",
+    "varyHeader": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+    "prefetchHeader": "next-router-prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSegmentHeader": "next-router-segment-prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments",
+    "clientParamParsing": true,
+    "dynamicRSCPrerender": true
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  },
+  "ppr": {
+    "chain": {
+      "headers": {
+        "next-resume": "1"
+      }
+    }
+  }
+}

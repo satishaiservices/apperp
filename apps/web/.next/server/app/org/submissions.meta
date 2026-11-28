@@ -1,0 +1,40 @@
+{
+  "status": 200,
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/org/layout,_N_T_/org/submissions/layout,_N_T_/org/submissions/page,_N_T_/org/submissions"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/org/submissions/__PAGE__"
+  ],
+  "prefetchHints": {
+    "hints": 49216,
+    "slots": {
+      "children": {
+        "hints": 49248,
+        "slots": {
+          "children": {
+            "hints": 49248,
+            "slots": {
+              "children": {
+                "hints": 49312,
+                "slots": null
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "routeCache": {
+    "key": "/route-cache/APP_PAGE/bac2cc7bf52382ab69bc12d78ac72d1ea448ae2cce8cb41b36d9d49940f882d9/$/org/submissions",
+    "owner": {
+      "kind": "APP_PAGE",
+      "sourceRoute": "/org/submissions/page"
+    },
+    "isFallback": false
+  }
+}

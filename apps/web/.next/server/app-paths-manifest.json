@@ -1,0 +1,14 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/_global-error/page": "app/_global-error/page.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/login/page": "app/login/page.js",
+  "/page": "app/page.js",
+  "/org/attendance/page": "app/org/attendance/page.js",
+  "/org/audit/page": "app/org/audit/page.js",
+  "/org/dashboard/page": "app/org/dashboard/page.js",
+  "/org/employees/page": "app/org/employees/page.js",
+  "/org/projects/page": "app/org/projects/page.js",
+  "/org/submissions/page": "app/org/submissions/page.js",
+  "/platform/page": "app/platform/page.js"
+}

@@ -1,0 +1,125 @@
+import { PrismaService } from '../database/prisma.service';
+import { AuditService } from '../audit/audit.service';
+import type { AuthenticatedUser } from '../auth/jwt-auth.guard';
+export declare class ProjectsService {
+    private readonly prisma;
+    private readonly audit;
+    constructor(prisma: PrismaService, audit: AuditService);
+    create(auth: AuthenticatedUser, input: any): Promise<{
+        id: string;
+        name: string;
+        status: string;
+        createdAt: Date;
+        updatedAt: Date;
+        tenantId: string;
+        description: string | null;
+        projectCode: string;
+        clientName: string | null;
+        siteAddress: string | null;
+        startChainage: string | null;
+        endChainage: string | null;
+        startLatitude: import("@prisma/client-runtime-utils").Decimal | null;
+        startLongitude: import("@prisma/client-runtime-utils").Decimal | null;
+        endLatitude: import("@prisma/client-runtime-utils").Decimal | null;
+        endLongitude: import("@prisma/client-runtime-utils").Decimal | null;
+        budget: import("@prisma/client-runtime-utils").Decimal | null;
+        startDate: Date | null;
+        endDate: Date | null;
+    }>;
+    findAll(auth: AuthenticatedUser): Promise<({
+        _count: {
+            activities: number;
+            siteSubmissions: number;
+        };
+    } & {
+        id: string;
+        name: string;
+        status: string;
+        createdAt: Date;
+        updatedAt: Date;
+        tenantId: string;
+        description: string | null;
+        projectCode: string;
+        clientName: string | null;
+        siteAddress: string | null;
+        startChainage: string | null;
+        endChainage: string | null;
+        startLatitude: import("@prisma/client-runtime-utils").Decimal | null;
+        startLongitude: import("@prisma/client-runtime-utils").Decimal | null;
+        endLatitude: import("@prisma/client-runtime-utils").Decimal | null;
+        endLongitude: import("@prisma/client-runtime-utils").Decimal | null;
+        budget: import("@prisma/client-runtime-utils").Decimal | null;
+        startDate: Date | null;
+        endDate: Date | null;
+    })[]>;
+    findOne(auth: AuthenticatedUser, id: string): Promise<{
+        id: string;
+        name: string;
+        status: string;
+        createdAt: Date;
+        updatedAt: Date;
+        tenantId: string;
+        description: string | null;
+        projectCode: string;
+        clientName: string | null;
+        siteAddress: string | null;
+        startChainage: string | null;
+        endChainage: string | null;
+        startLatitude: import("@prisma/client-runtime-utils").Decimal | null;
+        startLongitude: import("@prisma/client-runtime-utils").Decimal | null;
+        endLatitude: import("@prisma/client-runtime-utils").Decimal | null;
+        endLongitude: import("@prisma/client-runtime-utils").Decimal | null;
+        budget: import("@prisma/client-runtime-utils").Decimal | null;
+        startDate: Date | null;
+        endDate: Date | null;
+    }>;
+    update(auth: AuthenticatedUser, id: string, input: any): Promise<{
+        id: string;
+        name: string;
+        status: string;
+        createdAt: Date;
+        updatedAt: Date;
+        tenantId: string;
+        description: string | null;
+        projectCode: string;
+        clientName: string | null;
+        siteAddress: string | null;
+        startChainage: string | null;
+        endChainage: string | null;
+        startLatitude: import("@prisma/client-runtime-utils").Decimal | null;
+        startLongitude: import("@prisma/client-runtime-utils").Decimal | null;
+        endLatitude: import("@prisma/client-runtime-utils").Decimal | null;
+        endLongitude: import("@prisma/client-runtime-utils").Decimal | null;
+        budget: import("@prisma/client-runtime-utils").Decimal | null;
+        startDate: Date | null;
+        endDate: Date | null;
+    }>;
+    archive(auth: AuthenticatedUser, id: string): Promise<{
+        message: string;
+    }>;
+    duplicate(auth: AuthenticatedUser, id: string, body?: {
+        projectCode?: string;
+        name?: string;
+    }): Promise<{
+        id: string;
+        name: string;
+        status: string;
+        createdAt: Date;
+        updatedAt: Date;
+        tenantId: string;
+        description: string | null;
+        projectCode: string;
+        clientName: string | null;
+        siteAddress: string | null;
+        startChainage: string | null;
+        endChainage: string | null;
+        startLatitude: import("@prisma/client-runtime-utils").Decimal | null;
+        startLongitude: import("@prisma/client-runtime-utils").Decimal | null;
+        endLatitude: import("@prisma/client-runtime-utils").Decimal | null;
+        endLongitude: import("@prisma/client-runtime-utils").Decimal | null;
+        budget: import("@prisma/client-runtime-utils").Decimal | null;
+        startDate: Date | null;
+        endDate: Date | null;
+    }>;
+    private parseDate;
+}

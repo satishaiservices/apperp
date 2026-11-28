@@ -1,0 +1,40 @@
+{
+  "status": 200,
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/org/layout,_N_T_/org/audit/layout,_N_T_/org/audit/page,_N_T_/org/audit"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/org/audit/__PAGE__"
+  ],
+  "prefetchHints": {
+    "hints": 49216,
+    "slots": {
+      "children": {
+        "hints": 49248,
+        "slots": {
+          "children": {
+            "hints": 49248,
+            "slots": {
+              "children": {
+                "hints": 49312,
+                "slots": null
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "routeCache": {
+    "key": "/route-cache/APP_PAGE/29ea0e3b9ddbc99167b9a44991a30ba145ff06d24e993faba330cd64e9853f4b/$/org/audit",
+    "owner": {
+      "kind": "APP_PAGE",
+      "sourceRoute": "/org/audit/page"
+    },
+    "isFallback": false
+  }
+}
