@@ -10,24 +10,22 @@ SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 SET time_zone = '+00:00';
 
 -- Drop existing tables in reverse dependency order for clean re-imports
-DROP TABLE IF EXISTS ttendance_sessions;
+DROP TABLE IF EXISTS `attendance_sessions`;
 DROP TABLE IF EXISTS site_submission_photos;
 DROP TABLE IF EXISTS site_submission_activities;
 DROP TABLE IF EXISTS site_submissions;
 DROP TABLE IF EXISTS daily_progress_reports;
-DROP TABLE IF EXISTS ctivity_assignments;
-DROP TABLE IF EXISTS ctivities;
+DROP TABLE IF EXISTS activity_assignments;
+DROP TABLE IF EXISTS activities;
 DROP TABLE IF EXISTS projects;
-DROP TABLE IF EXISTS udit_logs;
+DROP TABLE IF EXISTS audit_logs;
 DROP TABLE IF EXISTS membership_roles;
-DROP TABLE IF EXISTS 
-ole_permissions;
-DROP TABLE IF EXISTS 
-oles;
+DROP TABLE IF EXISTS role_permissions;
+DROP TABLE IF EXISTS roles;
 DROP TABLE IF EXISTS permissions;
-DROP TABLE IF EXISTS 	enant_memberships;
+DROP TABLE IF EXISTS tenant_memberships;
 DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS 	enants;
+DROP TABLE IF EXISTS tenants;
 
 -- CreateTable
 CREATE TABLE `tenants` (
