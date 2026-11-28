@@ -2,17 +2,19 @@
 # Installs runtime dependencies (only when package-lock.json changed) and
 # restarts both Passenger apps. No building happens on the server: the
 # `production` branch already contains apps/api/dist and apps/web/.next.
-set -euo pipefail
+set -eo pipefail
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 LOG="$HOME/apperp-deploy.log"
-exec >>"$LOG" 2>&1
+exec > >(tee -a "$LOG") 2>&1
+trap 'echo "!! FAILED at line $LINENO: $BASH_COMMAND"' ERR
 echo "=== $(date) deploy $(git -C "$REPO" log --oneline -1)"
 
 for app in api web; do
   dir="$REPO/apps/$app"
-  venv=$(ls -d "$HOME"/nodevenv/repositories/apperp/apps/$app/*/ 2>/dev/null | sort -V | tail -1)
+  venv=""
+  for v in "$HOME"/nodevenv/repositories/apperp/apps/$app/*/; do if [ -f "$v/bin/activate" ]; then venv="$v"; fi; done
   if [ -z "$venv" ]; then
-    echo "!! No Node.js app found for apps/$app - create it in Setup Node.js App"; exit 1
+    echo "!! No Node.js virtualenv under $HOME/nodevenv/repositories/apperp/apps/$app - create it in Setup Node.js App"; ls -la "$HOME/nodevenv" "$HOME/nodevenv/repositories/apperp/apps" 2>&1 || true; exit 1
   fi
   if [ ! -f "$dir/dist/main.js" ] && [ ! -f "$dir/.next/BUILD_ID" ]; then
     echo "!! apps/$app has no build output - is the 'production' branch checked out?"; exit 1
