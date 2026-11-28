@@ -1,4 +1,6 @@
-import type { NextConfig } from "next";
+/** Plain JS on purpose: the cPanel server cannot run SWC (old glibc),
+ *  and Next.js must transpile a next.config.ts at every server start. */
+
 
 const securityHeaders = [
   {
@@ -27,7 +29,8 @@ const securityHeaders = [
   },
 ];
 
-const nextConfig: NextConfig = {
+/** @type {import("next").NextConfig} */
+const nextConfig = {
   /* config options here */
   images: {
     unoptimized: true,
