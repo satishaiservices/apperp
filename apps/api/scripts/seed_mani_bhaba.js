@@ -1,5 +1,5 @@
 const mysql = require('mysql2/promise');
-const argon2 = require('argon2');
+const argon2 = require('@node-rs/argon2');
 const crypto = require('node:crypto');
 
 async function seed() {

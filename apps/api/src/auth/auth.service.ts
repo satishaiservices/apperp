@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 
 import { JwtService } from '@nestjs/jwt';
-import { hash, verify } from 'argon2';
+import { hash, verify } from '@node-rs/argon2';
 import { randomUUID, randomInt } from 'crypto';
 import { PrismaService } from '../database/prisma.service';
 
