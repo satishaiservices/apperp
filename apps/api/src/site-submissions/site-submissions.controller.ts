@@ -21,7 +21,11 @@ import { validateImageMagicBytes } from '../common/utils/file-signature.util';
 import { ImageProcessorService } from '../common/services/image-processor.service';
 import { CreateSubmissionDto } from './dto/submission.dto';
 
-const uploadDir = resolve(process.cwd(), 'storage/site-submissions');
+// Must match StorageService's base dir, which serves the photos back (STORAGE_DIR).
+const uploadDir = resolve(
+  process.env.STORAGE_DIR ? resolve(process.env.STORAGE_DIR) : resolve(process.cwd(), 'storage'),
+  'site-submissions',
+);
 mkdirSync(uploadDir, { recursive: true });
 
 const allowedTypes: Record<string, string> = {

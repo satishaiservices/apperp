@@ -133,3 +133,7 @@ FROM `activities`
 WHERE `tenant_id` = 'c8d1e2f3-4a5b-6c7d-8e9f-0a1b2c3d4e5f';
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+-- Seeded passwords are public (documented above): force a change at first login.
+UPDATE `users` SET `must_change_password` = true
+WHERE `username` IN ('mani.bhaba', 'mani', 'superuser');

@@ -1,52 +1,61 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import type { NestExpressApplication } from '@nestjs/platform-express';
+import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
 import { AppModule, ObserveInstrument } from './app.module';
 
+const DEFAULT_PRODUCTION_ORIGINS = ['https://apperp.yecindia.com'];
+const DEV_ORIGIN = /^http:\/\/(localhost|127\.0\.0\.1|10\.0\.2\.2|192\.168\.\d+\.\d+)(:\d+)?$/;
+
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     instrument: ObserveInstrument,
   });
 
-  // Configure CORS securely with origin whitelist
-  const rawCorsOrigins = process.env.CORS_ALLOWED_ORIGINS;
-  const defaultAllowedOrigins = [
-    'https://apperp.yecindia.com',
-    'http://apperp.yecindia.com',
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
-    'http://localhost:3001',
-    'http://127.0.0.1:3001',
-  ];
-  const allowedOrigins = rawCorsOrigins
-    ? rawCorsOrigins.split(',').map((o) => o.trim()).filter(Boolean)
-    : defaultAllowedOrigins;
+  const isProduction = process.env.NODE_ENV === 'production';
+
+  // LiteSpeed/Passenger proxies every request: trust exactly one proxy hop so that
+  // req.ip (used by the rate limiter) is the visitor's address, not the proxy's.
+  app.set('trust proxy', Number(process.env.TRUST_PROXY_HOPS ?? 1));
+
+  app.use(
+    helmet({
+      // API returns JSON and images only; the web app sets its own CSP.
+      contentSecurityPolicy: { directives: { defaultSrc: ["'none'"], frameAncestors: ["'none'"] } },
+      crossOriginResourcePolicy: { policy: 'same-site' },
+    }),
+  );
+  app.use(cookieParser());
+
+  // CORS: only explicitly configured origins (comma-separated CORS_ALLOWED_ORIGINS).
+  // Development additionally allows localhost / LAN addresses.
+  const configuredOrigins = (process.env.CORS_ALLOWED_ORIGINS ?? '')
+    .split(',')
+    .map((o) => o.trim())
+    .filter(Boolean);
+  const allowedOrigins = configuredOrigins.length
+    ? configuredOrigins
+    : isProduction
+      ? DEFAULT_PRODUCTION_ORIGINS
+      : [];
 
   app.enableCors({
     origin: (
       requestOrigin: string | undefined,
       callback: (err: Error | null, allow?: boolean) => void,
     ) => {
-      // Allow requests with no origin (such as mobile apps, curl, server-to-server)
+      // No Origin header: mobile apps, curl, server-to-server (not subject to CORS).
       if (!requestOrigin) {
         return callback(null, true);
       }
-      if (
-        allowedOrigins.includes(requestOrigin) ||
-        requestOrigin === 'https://apperp.yecindia.com' ||
-        requestOrigin.endsWith('.yecindia.com') ||
-        requestOrigin.endsWith('.trycloudflare.com') ||
-        (process.env.NODE_ENV !== 'production' &&
-          (requestOrigin.startsWith('http://localhost:') ||
-            requestOrigin.startsWith('http://127.0.0.1:') ||
-            requestOrigin.startsWith('http://10.0.2.2:') ||
-            requestOrigin.startsWith('http://192.168.')))
-      ) {
+      if (allowedOrigins.includes(requestOrigin) || (!isProduction && DEV_ORIGIN.test(requestOrigin))) {
         return callback(null, true);
       }
-      return callback(new Error(`Origin ${requestOrigin} not allowed by CORS`));
+      return callback(null, false);
     },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    allowedHeaders: 'Content-Type,Accept,Authorization,X-Requested-With',
+    allowedHeaders: 'Content-Type,Accept,Authorization,X-Requested-With,X-Session-Mode',
     credentials: true,
   });
 

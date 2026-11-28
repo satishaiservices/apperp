@@ -20,8 +20,8 @@ import {
 export default function LoginPage() {
   const { login } = useAuth();
   const [mode, setMode] = useState<'org' | 'platform'>('org');
-  const [identifier, setIdentifier] = useState('mani.bhaba');
-  const [password, setPassword] = useState('1234root');
+  const [identifier, setIdentifier] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -30,13 +30,7 @@ export default function LoginPage() {
   const handleModeSwitch = (newMode: 'org' | 'platform') => {
     setMode(newMode);
     setError(null);
-    if (newMode === 'platform') {
-      setIdentifier('superuser');
-      setPassword('Password123!');
-    } else {
-      setIdentifier('mani.bhaba');
-      setPassword('1234root');
-    }
+    setPassword('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -163,7 +157,7 @@ export default function LoginPage() {
                   required
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
-                  placeholder={mode === 'platform' ? 'superuser or superuser@vyhir.com' : 'mani.bhaba or mani.bhaba@yecindia.com'}
+                  placeholder={mode === 'platform' ? 'Superadmin username or email' : 'Username or email'}
                   className="w-full pl-9 pr-3 py-2 text-xs font-mono bg-slate-50 border border-slate-300 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0A5C36]/20 focus:border-[#0A5C36] transition-colors"
                 />
               </div>
