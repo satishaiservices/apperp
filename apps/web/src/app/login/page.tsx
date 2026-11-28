@@ -20,8 +20,8 @@ import {
 export default function LoginPage() {
   const { login } = useAuth();
   const [mode, setMode] = useState<'org' | 'platform'>('org');
-  const [identifier, setIdentifier] = useState('r.verma.nh48');
-  const [password, setPassword] = useState('ApexPassword123!');
+  const [identifier, setIdentifier] = useState('mani.bhaba');
+  const [password, setPassword] = useState('1234root');
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -31,11 +31,11 @@ export default function LoginPage() {
     setMode(newMode);
     setError(null);
     if (newMode === 'platform') {
-      setIdentifier('superadmin');
+      setIdentifier('superuser');
       setPassword('Password123!');
     } else {
-      setIdentifier('r.verma.nh48');
-      setPassword('ApexPassword123!');
+      setIdentifier('mani.bhaba');
+      setPassword('1234root');
     }
   };
 
@@ -163,7 +163,7 @@ export default function LoginPage() {
                   required
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
-                  placeholder={mode === 'platform' ? 'superadmin or admin@vyhir.com' : 'r.verma.nh48 or email'}
+                  placeholder={mode === 'platform' ? 'superuser or superuser@vyhir.com' : 'mani.bhaba or mani.bhaba@yecindia.com'}
                   className="w-full pl-9 pr-3 py-2 text-xs font-mono bg-slate-50 border border-slate-300 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0A5C36]/20 focus:border-[#0A5C36] transition-colors"
                 />
               </div>
