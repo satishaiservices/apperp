@@ -2,11 +2,11 @@
 # Installs runtime dependencies (only when package-lock.json changed) and
 # restarts both Passenger apps. No building happens on the server: the
 # `production` branch already contains apps/api/dist and apps/web/.next.
-set -eo pipefail
+set -eEo pipefail
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 LOG="$HOME/apperp-deploy.log"
-exec > >(tee -a "$LOG") 2>&1
 trap 'echo "!! FAILED at line $LINENO: $BASH_COMMAND"' ERR
+main() {
 echo "=== $(date) deploy $(git -C "$REPO" log --oneline -1)"
 
 for app in api web; do
@@ -33,3 +33,7 @@ for app in api web; do
   echo "-- restarted $app"
 done
 echo "=== done"
+}
+
+# Plain pipe (no process substitution: CageFS has no /dev/fd)
+main 2>&1 | tee -a "$LOG"
