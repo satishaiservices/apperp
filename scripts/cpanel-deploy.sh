@@ -23,6 +23,8 @@ for app in api web; do
   if [ "$(cat "$stamp" 2>/dev/null)" != "$hash" ]; then
     echo "-- installing dependencies for $app"
     ( source "$venv/bin/activate" && cd "$dir" && npm install --omit=dev --ignore-scripts --no-audit --no-fund )
+    # npm may rewrite the lockfile; restore it so cPanel sees a clean tree
+    git -C "$REPO" checkout -- "apps/$app/package-lock.json" "apps/$app/package.json" || true
     echo "$hash" > "$stamp"
   fi
   touch "$dir/tmp/restart.txt"
