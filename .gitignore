@@ -55,3 +55,8 @@ apps/api/src/generated/prisma/
 
 # Local API uploads and runtime storage
 apps/api/storage/
+
+# cPanel / Passenger runtime files
+node_modules
+apps/*/tmp/
+.cpanel_deploy*

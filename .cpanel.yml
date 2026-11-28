@@ -1,0 +1,6 @@
+---
+# Run by cPanel > Git Version Control > Manage > Pull or Deploy > "Deploy HEAD Commit".
+# Check out the `production` branch on the server (it contains prebuilt files).
+deployment:
+  tasks:
+    - /bin/bash $HOME/repositories/apperp/scripts/cpanel-deploy.sh
